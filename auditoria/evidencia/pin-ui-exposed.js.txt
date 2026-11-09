@@ -1,0 +1,20 @@
+1173|              Seguridad & Claves de Acceso de Personal
+1174|              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Restricción Activa</span>
+1175|            </h4>
+1176|            <p class="text-xs text-slate-300">El Portal Huésped es 100% público. Administración y Limpieza requieren clave de seguridad autorizada.</p>
+1177|          </div>
+1178|        </div>
+1179|        <div class="flex flex-wrap items-center gap-2 text-xs">
+1180|          <div class="bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+1181|            <span class="text-slate-400">PIN Admin:</span>
+1182|            <span class="font-mono font-bold text-amber-300 ml-1">1234 / shadai2026</span>
+1183|          </div>
+1184|          <div class="bg-white/10 px-3 py-1.5 rounded-xl border border-white/10">
+1185|            <span class="text-slate-400">PIN Limpieza:</span>
+1186|            <span class="font-mono font-bold text-amber-300 ml-1">2026 / limpieza2026</span>
+1187|          </div>
+1188|          <button onclick="handleChangeSecurityPassPrompt()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition shadow flex items-center gap-1">
+1189|            <i data-lucide="key" class="w-3.5 h-3.5"></i> Cambiar Clave
+1190|          </button>
+1191|        </div>
+1192|      </div>

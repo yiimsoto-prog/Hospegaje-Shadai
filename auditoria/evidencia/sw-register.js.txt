@@ -1,0 +1,16 @@
+7805|// ============================================================================
+7806|let deferredPrompt = null;
+7807|
+7808|// Registrar Service Worker
+7809|if ('serviceWorker' in navigator) {
+7810|  window.addEventListener('load', () => {
+7811|    navigator.serviceWorker.register('./sw.js')
+7812|      .then(reg => console.log('✓ Service Worker registrado:', reg.scope))
+7813|      .catch(err => console.log('! Error registrando Service Worker:', err));
+7814|  });
+7815|}
+7816|
+7817|// Capturar evento de instalación nativa en Android / Chrome
+7818|window.addEventListener('beforeinstallprompt', e => {
+7819|  e.preventDefault();
+7820|  deferredPrompt = e;

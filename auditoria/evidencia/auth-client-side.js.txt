@@ -1,0 +1,267 @@
+4870|// ============================================================================
+4871|// SISTEMA DE SEGURIDAD Y CONTROL DE ACCESO (PERSONAL AUTORIZADO)
+4872|// ============================================================================
+4873|
+4874|// Claves de acceso maestras por defecto
+4875|const AUTH_CONFIG = {
+4876|  adminKeys: ['shadai2026', '1234', 'sangre2022dejesus', 'admin123', 'admin2026'],
+4877|  housekeepingKeys: ['limpieza2026', '2026', 'limpieza123', 'limpieza']
+4878|};
+4879|
+4880|let currentPendingRole = null;
+4881|
+4882|// Verifica si el rol solicitado tiene autorización activa
+4883|function isRoleAuthorized(role) {
+4884|  if (role === 'guest') return true;
+4885|  
+4886|  const auth = sessionStorage.getItem('shadai_auth_role') || localStorage.getItem('shadai_auth_role');
+4887|  if (!auth) return false;
+4888|  
+4889|  if (role === 'admin') {
+4890|    return auth === 'admin';
+4891|  }
+4892|  if (role === 'housekeeping') {
+4893|    return auth === 'admin' || auth === 'housekeeping';
+4894|  }
+4895|  return false;
+4896|}
+4897|
+4898|// Devuelve el rol actualmente autorizado ('admin', 'housekeeping', o null)
+4899|function getAuthorizedRole() {
+4900|  return sessionStorage.getItem('shadai_auth_role') || localStorage.getItem('shadai_auth_role') || null;
+4901|}
+4902|
+4903|// Solicita acceso restringido a un rol
+4904|function requestRoleAccess(targetRole) {
+4905|  if (isRoleAuthorized(targetRole)) {
+4906|    applyRole(targetRole);
+4907|    return;
+4908|  }
+4909|  
+4910|  currentPendingRole = targetRole;
+4911|  openStaffAuthModal(targetRole);
+4912|}
+4913|
+4914|// Abre el modal de autenticación con los textos adecuados
+4915|function openStaffAuthModal(targetRole) {
+4916|  const modal = document.getElementById('modalStaffAuth');
+4917|  if (!modal) return;
+4918|  
+4919|  const inputEl = document.getElementById('staffAuthInput');
+4920|  const errorEl = document.getElementById('staffAuthErrorMsg');
+4921|  
+4922|  if (errorEl) errorEl.classList.add('hidden');
+4923|  if (inputEl) {
+4924|    inputEl.value = '';
+4925|    inputEl.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500');
+4926|  }
+4927|  
+4928|  setAuthTargetRole(targetRole || 'admin');
+4929|  modal.classList.remove('hidden');
+4930|  modal.style.display = 'flex';
+4931|  lucide.createIcons();
+4932|  
+4933|  setTimeout(() => {
+4934|    if (inputEl) inputEl.focus();
+4935|  }, 100);
+4936|}
+4937|
+4938|// Cambia el rol objetivo dentro del modal
+4939|function setAuthTargetRole(role) {
+4940|  currentPendingRole = role;
+4941|  const titleEl = document.getElementById('staffAuthModalTitle');
+4942|  const descEl = document.getElementById('staffAuthModalDesc');
+4943|  const btnAdmin = document.getElementById('btnAuthRoleAdmin');
+4944|  const btnHk = document.getElementById('btnAuthRoleHk');
+4945|  
+4946|  if (role === 'admin') {
+4947|    if (titleEl) titleEl.textContent = 'Panel Administrativo PMS';
+4948|    if (descEl) descEl.textContent = 'Acceso reservado para Administración y Recepción de Hospedaje Shadai';
+4949|    if (btnAdmin) {
+4950|      btnAdmin.className = 'py-2.5 px-3 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-2 transition border-blue-600 bg-blue-50 text-blue-900';
+4951|    }
+4952|    if (btnHk) {
+4953|      btnHk.className = 'py-2.5 px-3 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-2 transition border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300';
+4954|    }
+4955|  } else {
+4956|    if (titleEl) titleEl.textContent = 'Módulo de Limpieza (Housekeeping)';
+4957|    if (descEl) descEl.textContent = 'Acceso reservado para Personal de Limpieza y Mantenimiento';
+4958|    if (btnAdmin) {
+4959|      btnAdmin.className = 'py-2.5 px-3 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-2 transition border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300';
+4960|    }
+4961|    if (btnHk) {
+4962|      btnHk.className = 'py-2.5 px-3 rounded-xl border-2 text-xs font-bold flex items-center justify-center gap-2 transition border-blue-600 bg-blue-50 text-blue-900';
+4963|    }
+4964|  }
+4965|}
+4966|
+4967|// Verifica la contraseña o PIN ingresado
+4968|function verifyStaffAuth() {
+4969|  const inputEl = document.getElementById('staffAuthInput');
+4970|  const errorEl = document.getElementById('staffAuthErrorMsg');
+4971|  const errorTextEl = document.getElementById('staffAuthErrorText');
+4972|  const rememberEl = document.getElementById('staffAuthRemember');
+4973|  
+4974|  const val = (inputEl ? inputEl.value : '').trim();
+4975|  const targetRole = currentPendingRole || 'admin';
+4976|  
+4977|  // Claves personalizadas en localStorage si existen
+4978|  const customAdmin = localStorage.getItem('shadai_custom_admin_pass');
+4979|  const customHk = localStorage.getItem('shadai_custom_hk_pass');
+4980|  
+4981|  const adminKeys = [...AUTH_CONFIG.adminKeys];
+4982|  if (customAdmin) adminKeys.push(customAdmin);
+4983|  
+4984|  const hkKeys = [...AUTH_CONFIG.housekeepingKeys, ...adminKeys];
+4985|  if (customHk) hkKeys.push(customHk);
+4986|  
+4987|  let isValid = false;
+4988|  let grantedRole = targetRole;
+4989|  
+4990|  if (targetRole === 'admin') {
+4991|    if (adminKeys.includes(val)) {
+4992|      isValid = true;
+4993|      grantedRole = 'admin';
+4994|    }
+4995|  } else if (targetRole === 'housekeeping') {
+4996|    if (hkKeys.includes(val)) {
+4997|      isValid = true;
+4998|      // Si usó clave de admin, se le da rol admin (que tiene acceso a todo)
+4999|      grantedRole = adminKeys.includes(val) ? 'admin' : 'housekeeping';
+5000|    }
+5001|  }
+5002|  
+5003|  if (isValid) {
+5004|    // Guardar sesión
+5005|    sessionStorage.setItem('shadai_auth_role', grantedRole);
+5006|    if (rememberEl && rememberEl.checked) {
+5007|      localStorage.setItem('shadai_auth_role', grantedRole);
+5008|    }
+5009|    
+5010|    // Cerrar modal
+5011|    closeModal('modalStaffAuth');
+5012|    
+5013|    // Aplicar rol
+5014|    applyRole(targetRole);
+5015|    updateStaffSecurityUI();
+5016|    showToast(`Acceso verificado. Bienvenido al módulo de ${targetRole === 'admin' ? 'Administración PMS' : 'Limpieza'}.`, 'success');
+5017|
+5018|    if (window._pendingAssignRoomNumber !== undefined && window._pendingAssignRoomNumber !== false) {
+5019|      const targetRoom = window._pendingAssignRoomNumber;
+5020|      window._pendingAssignRoomNumber = false;
+5021|      setTimeout(() => {
+5022|        openQuickAssignModal(targetRoom);
+5023|      }, 300);
+5024|    }
+5025|  } else {
+5026|    if (errorEl) {
+5027|      errorEl.classList.remove('hidden');
+5028|      if (errorTextEl) errorTextEl.textContent = 'Contraseña o PIN incorrecto. Acceso reservado para personal autorizado.';
+5029|    }
+5030|    if (inputEl) {
+5031|      inputEl.classList.add('border-rose-500', 'ring-2', 'ring-rose-500');
+5032|      inputEl.select();
+5033|    }
+5034|  }
+5035|}
+5036|
+5037|// Cancela la autenticación y asegura quedarse en Portal Huésped
+5038|function cancelStaffAuth() {
+5039|  closeModal('modalStaffAuth');
+5040|  applyRole('guest');
+5041|  updateStaffSecurityUI();
+5042|}
+5043|
+5044|// Cierra la sesión del personal y vuelve a restringir los paneles
+5045|function logoutStaff() {
+5046|  sessionStorage.removeItem('shadai_auth_role');
+5047|  localStorage.removeItem('shadai_auth_role');
+5048|  
+5049|  applyRole('guest');
+5050|  updateStaffSecurityUI();
+5051|  showToast('Sesión de personal cerrada. Los paneles administrativos quedan restringidos.', 'info');
+5052|}
+5053|
+5054|// Alternar ver/ocultar contraseña en el input
+5055|function toggleStaffAuthPasswordVisibility() {
+5056|  const input = document.getElementById('staffAuthInput');
+5057|  const icon = document.getElementById('staffAuthEyeIcon');
+5058|  if (!input) return;
+5059|  
+5060|  if (input.type === 'password') {
+5061|    input.type = 'text';
+5062|    if (icon) icon.setAttribute('data-lucide', 'eye-off');
+5063|  } else {
+5064|    input.type = 'password';
+5065|    if (icon) icon.setAttribute('data-lucide', 'eye');
+5066|  }
+5067|  lucide.createIcons();
+5068|}
+5069|
+5070|// Actualiza los candados, botones de salir y herramientas de staff en la UI
+5071|function updateStaffSecurityUI() {
+5072|  const authRole = getAuthorizedRole();
+5073|  const isAuth = !!authRole;
+5074|  const isAdmin = authRole === 'admin';
+5075|  const isHk = authRole === 'housekeeping' || isAdmin;
+5076|  
+5077|  // Candados Desktop
+5078|  const lockAdmin = document.getElementById('lockIconAdmin');
+5079|  const lockHk = document.getElementById('lockIconHk');
+5080|  if (lockAdmin) lockAdmin.style.display = isAdmin ? 'none' : 'inline-block';
+5081|  if (lockHk) lockHk.style.display = isHk ? 'none' : 'inline-block';
+5082|  
+5083|  // Candados Móvil
+5084|  const lockAdminMob = document.getElementById('lockIconAdminMob');
+5085|  const lockHkMob = document.getElementById('lockIconHkMob');
+5086|  if (lockAdminMob) lockAdminMob.style.display = isAdmin ? 'none' : 'inline-block';
+5087|  if (lockHkMob) lockHkMob.style.display = isHk ? 'none' : 'inline-block';
+5088|  
+5089|  // Badge de sesión en Desktop
+5090|  const badge = document.getElementById('staffAuthBadge');
+5091|  const badgeText = document.getElementById('staffAuthBadgeText');
+5092|  if (badge) {
+5093|    badge.classList.toggle('hidden', !isAuth);
+5094|    badge.classList.toggle('flex', isAuth);
+5095|    if (badgeText) {
+5096|      badgeText.textContent = isAdmin ? 'Admin Activo' : 'Limpieza Activa';
+5097|    }
+5098|  }
+5099|  
+5100|  // Botón salir en Móvil
+5101|  const btnMobLogout = document.getElementById('btnMobileLogout');
+5102|  if (btnMobLogout) {
+5103|    btnMobLogout.classList.toggle('hidden', !isAuth);
+5104|  }
+5105|  
+5106|  // Herramientas exclusivas de staff: Restablecer demo y Simular Huésped
+5107|  const btnReset = document.getElementById('btnResetDemo');
+5108|  if (btnReset) {
+5109|    btnReset.classList.toggle('hidden', !isAdmin);
+5110|  }
+5111|  
+5112|  const simBar = document.getElementById('guestSimulationBar');
+5113|  if (simBar) {
+5114|    simBar.classList.toggle('hidden', !isAdmin);
+5115|  }
+5116|  
+5117|  lucide.createIcons();
+5118|}
+5119|
+5120|// Cambiar clave de seguridad desde el panel administrativo
+5121|function handleChangeSecurityPassPrompt() {
+5122|  const choice = prompt('CONFIGURACIÓN DE SEGURIDAD\n\n¿Qué clave deseas cambiar?\n1 = Clave de Administración PMS\n2 = Clave de Personal de Limpieza\n\nEscribe 1 o 2:');
+5123|  if (choice === '1') {
+5124|    const newPass = prompt('Ingresa la nueva contraseña o PIN para Administración PMS:');
+5125|    if (newPass && newPass.trim().length >= 3) {
+5126|      localStorage.setItem('shadai_custom_admin_pass', newPass.trim());
+5127|      showToast('Nueva clave de Administración guardada con éxito.', 'success');
+5128|    }
+5129|  } else if (choice === '2') {
+5130|    const newPass = prompt('Ingresa la nueva contraseña o PIN para Personal de Limpieza:');
+5131|    if (newPass && newPass.trim().length >= 3) {
+5132|      localStorage.setItem('shadai_custom_hk_pass', newPass.trim());
+5133|      showToast('Nueva clave de Limpieza guardada con éxito.', 'success');
+5134|    }
+5135|  }
+5136|}
