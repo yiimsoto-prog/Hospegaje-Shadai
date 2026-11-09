@@ -1,0 +1,23 @@
+[
+  {
+    "id": "CON-01",
+    "ruc": "20100000001",
+    "razon_social": "Contrata Demo Andina S.A.",
+    "contacto": "Operaciones Demo",
+    "telefono": "900000001"
+  },
+  {
+    "id": "CON-02",
+    "ruc": "20100000002",
+    "razon_social": "Servicios Mineros Ejemplo S.A.C.",
+    "contacto": "Logística Demo",
+    "telefono": "900000002"
+  },
+  {
+    "id": "CON-03",
+    "ruc": "20100000003",
+    "razon_social": "Ingeniería Alto Andino S.A.",
+    "contacto": "RRHH Demo",
+    "telefono": "900000003"
+  }
+]

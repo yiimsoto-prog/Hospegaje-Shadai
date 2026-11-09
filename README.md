@@ -1,40 +1,51 @@
-# Auditoría Forense — Hospedaje Shadai
+# Hospedaje Shadai — código maestro unificado
 
-Este repositorio contiene el **informe forense y el kit de remediación** de las aplicaciones web desplegadas en Netlify para Hospedaje Shadai (Challhuahuacho), no el código fuente original (el producto vive hoy como HTML monolítico publicado en CDN).
+PWA de gestión hotelera para **Hospedaje Shadai** (Challhuahuacho, Apurímac). Consolida en un solo origen las tres versiones Netlify previas (PMS, check-out móvil y landing).
 
-## Sitios auditados
+## Qué incluye
 
-| URL | Rol |
+| Ruta | Módulo |
 |---|---|
-| https://apphospedajeshadai.netlify.app/ | PMS + Portal huésped + Housekeeping (PWA) |
-| https://check-out-hospedaje-shadai.netlify.app/ | Check-out móvil |
-| https://hospedaje-shadai1.netlify.app/ | Landing marketing |
+| `/` | Landing corporativa |
+| `/pms/` | Portal huésped + Admin PMS + Housekeeping |
+| `/checkout/?hab=101` | Check-out móvil (mismo codebase y storage) |
 
-## Veredicto (una línea)
+**Admin:** pizarra de habitaciones, check-in exprés, liquidación B2B, caja chica, asistencia de personal, housekeeping.  
+**Seguridad:** sin PINs en la UI; modo muestra con credenciales demo no publicadas en pantalla de producción; esquema Supabase + RLS en `supabase/migrations/`.  
+**Tema:** claro / oscuro con tokens de contraste AA.
 
-**No apto para producción multi-sede:** autenticación solo en el cliente, PINs y Wi‑Fi publicados en el HTML, sin API real (todas las rutas `/api/*` → 404) y tres orígenes que no comparten datos.
+## Desarrollo local
 
-## Contenido
-
-```
-auditoria/
-  HALLAZGOS.md                 # Informe completo (5 pilares)
-  evidencia/                   # Extractos de código y métricas
-  remediacion/
-    01-auth-server.md          # Auth/RBAC server-side
-    02-xss-dom.md              # Parches anti-XSS
-    03-arquitectura-api.md     # Unificación orígenes + API
-    04-ui-a11y-contraste.md    # Contraste, ARIA, temas
-    05-limpieza-sw-bloat.md    # SW, base64, CDN, dead code
+```bash
+npm install
+npm run dev
+# http://127.0.0.1:43123
 ```
 
-## Cómo usar este material
+Sin `.env.local` corre con **datos de muestra** (localStorage).  
+PINs demo (solo mock): `demo-admin` / `demo-hk`.
 
-1. Leer `auditoria/HALLAZGOS.md`.
-2. Aplicar en orden: **01 → 03 → 02 → 05 → 04** (seguridad y datos primero).
-3. Rotar de inmediato la clave Wi‑Fi y todos los PINs expuestos.
-4. Publicar un único origen con backend y base de datos antes de operar recepción real.
+Conectar Supabase:
 
-## Nota de alcance
+```bash
+cp .env.example .env.local
+# completar URL y anon key
+# ejecutar SQL: supabase/migrations/001_hospedaje_shadai.sql
+```
 
-El briefing mencionaba un estudio de abogados. Las URLs entregadas corresponden a un **PMS de hospedaje minero**. Si existe otra aplicación legal, debe auditarse por separado.
+## Build estático (Cloudflare Pages)
+
+```bash
+npm run build   # genera ./out
+npm run preview # sirve out en :43123
+```
+
+Guía completa GitHub / GitLab / Cloudflare: [`docs/DEPLOY.md`](docs/DEPLOY.md).
+
+## Auditoría previa
+
+El informe forense de las versiones fragmentadas está en [`auditoria/HALLAZGOS.md`](auditoria/HALLAZGOS.md).
+
+## Stack
+
+Next.js (static export) · TypeScript · Tailwind CSS 4 · Supabase JS · Lucide · PWA manifest
