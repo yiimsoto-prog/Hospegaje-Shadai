@@ -1,20 +1,23 @@
 # Hospedaje Shadai — código maestro unificado
 
-PWA de gestión hotelera para **Hospedaje Shadai** (Challhuahuacho, Apurímac). Consolida en un solo origen las tres versiones Netlify previas (PMS, check-out móvil y landing).
+PWA/sistema de gestión para **Hospedaje Shadai** (Challhuahuacho). Unifica landing, PMS, housekeeping, check-out móvil, caja chica, asistencia y liquidación B2B.
 
-## Qué incluye
+## Seguridad (producción)
+
+- Personal autorizado en el **servidor** (`/api/*`) con identidad Cursor verificada.
+- Datos en **Postgres** (`migrations/` + `DATABASE_URL` en el host publicado).
+- **Sin PINs** ni claves Wi‑Fi en el frontend.
+- Publicar como app **privada** o **team** en Cursor (no pública) para el gate de identidad.
+
+## Rutas
 
 | Ruta | Módulo |
 |---|---|
-| `/` | Landing corporativa |
-| `/pms/` | Portal huésped + Admin PMS + Housekeeping |
-| `/checkout/?hab=101` | Check-out móvil (mismo codebase y storage) |
+| `/` | Landing |
+| `/pms` | Portal huésped + Admin + Limpieza |
+| `/checkout?hab=101` | Check-out móvil |
 
-**Admin:** pizarra de habitaciones, check-in exprés, liquidación B2B, caja chica, asistencia de personal, housekeeping.  
-**Seguridad:** sin PINs en la UI; modo muestra con credenciales demo no publicadas en pantalla de producción; esquema Supabase + RLS en `supabase/migrations/`.  
-**Tema:** claro / oscuro con tokens de contraste AA.
-
-## Desarrollo local
+## Desarrollo
 
 ```bash
 npm install
@@ -22,30 +25,21 @@ npm run dev
 # http://127.0.0.1:43123
 ```
 
-Sin `.env.local` corre con **datos de muestra** (localStorage).  
-PINs demo (solo mock): `demo-admin` / `demo-hk`.
+En local, la identidad simulada (`cursor/identity.dev.ts`) permite registrar el **primer administrador** (bootstrap) y operar el PMS contra PGlite.
 
-Conectar Supabase:
+## Supabase (opcional / Cloudflare)
 
-```bash
-cp .env.example .env.local
-# completar URL y anon key
-# ejecutar SQL: supabase/migrations/001_hospedaje_shadai.sql
-```
+El esquema de referencia RLS está en `supabase/migrations/001_hospedaje_shadai.sql` para un proyecto Supabase propio. El runtime publicado en Cursor usa Postgres de la plataforma (`cursor-app.json`).
 
-## Build estático (Cloudflare Pages)
+Variables solo si conectas Supabase por tu cuenta (configúralas en el panel del host; no van en el repo):
 
-```bash
-npm run build   # genera ./out
-npm run preview # sirve out en :43123
-```
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-Guía completa GitHub / GitLab / Cloudflare: [`docs/DEPLOY.md`](docs/DEPLOY.md).
+## Cloudflare Pages / GitHub / GitLab
 
-## Auditoría previa
+Ver `docs/DEPLOY.md`. El build con rutas API requiere un host Node (Cursor Apps, o adaptador OpenNext en Cloudflare). El export estático anterior se eliminó a propósito: no hay frontera de seguridad sin servidor.
 
-El informe forense de las versiones fragmentadas está en [`auditoria/HALLAZGOS.md`](auditoria/HALLAZGOS.md).
+## Auditoría legacy
 
-## Stack
-
-Next.js (static export) · TypeScript · Tailwind CSS 4 · Supabase JS · Lucide · PWA manifest
+Resumen redactado (sin secretos): `auditoria/README.md`.

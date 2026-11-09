@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import {
   BedDouble,
   ClipboardList,
-  LogOut,
   Moon,
   Shield,
   Sparkles,
@@ -34,15 +33,14 @@ export function PmsApp() {
   const {
     state,
     ready,
-    session,
-    loginStaff,
-    logoutStaff,
+    me,
+    refresh,
+    bootstrapAdmin,
     assignGuardia,
     markRoomClean,
     liberarGuardia,
     addPettyCash,
     addAttendance,
-    resetDemo,
     stats,
   } = useAppStore();
   const { theme, toggleTheme } = useTheme();
@@ -50,33 +48,57 @@ export function PmsApp() {
   const [roleView, setRoleView] = useState<StaffRole>("guest");
   const [authOpen, setAuthOpen] = useState(false);
   const [authTarget, setAuthTarget] = useState<Exclude<StaffRole, "guest">>("admin");
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [canBootstrap, setCanBootstrap] = useState(false);
   const [assignRoom, setAssignRoom] = useState<string | null>(null);
   const [adminTab, setAdminTab] = useState<AdminTab>("rack");
   const [toast, setToast] = useState<string | null>(null);
 
-  const canAdmin = session?.role === "admin";
-  const canHk = session?.role === "admin" || session?.role === "housekeeping";
-
-  function requestRole(next: StaffRole) {
-    if (next === "guest") {
-      setRoleView("guest");
-      return;
-    }
-    if (next === "admin" && canAdmin) {
-      setRoleView("admin");
-      return;
-    }
-    if (next === "housekeeping" && canHk) {
-      setRoleView("housekeeping");
-      return;
-    }
-    setAuthTarget(next);
-    setAuthOpen(true);
-  }
+  const canAdmin = me?.role === "admin";
+  const canHk = me?.role === "admin" || me?.role === "housekeeping";
 
   function showToast(msg: string) {
     setToast(msg);
     window.setTimeout(() => setToast(null), 2800);
+  }
+
+  async function requestRole(next: StaffRole) {
+    if (next === "guest") {
+      setRoleView("guest");
+      return;
+    }
+    const res = await fetch("/api/auth/me", { cache: "no-store" });
+    if (res.status === 401) {
+      setAuthTarget(next);
+      setCanBootstrap(false);
+      setAuthMessage("Inicia sesión con Cursor (app privada o de equipo) para continuar.");
+      setAuthOpen(true);
+      return;
+    }
+    const data = (await res.json()) as {
+      role: "admin" | "housekeeping" | null;
+      canBootstrap?: boolean;
+      teamRole?: string | null;
+    };
+    setCanBootstrap(Boolean(data.canBootstrap));
+    await refresh();
+    const effective =
+      data.role || (data.teamRole === "admin" && next === "admin" ? "admin" : null);
+    if (next === "admin" && (effective === "admin" || data.teamRole === "admin")) {
+      setRoleView("admin");
+      return;
+    }
+    if (next === "housekeeping" && (effective === "admin" || effective === "housekeeping")) {
+      setRoleView("housekeeping");
+      return;
+    }
+    setAuthTarget(next);
+    setAuthMessage(
+      data.canBootstrap
+        ? "Aún no hay personal. Puedes registrar el primer administrador."
+        : "Tu usuario no tiene rol de personal. Pide alta al administrador."
+    );
+    setAuthOpen(true);
   }
 
   const pendingHk = useMemo(
@@ -104,7 +126,7 @@ export function PmsApp() {
               Hospedaje Shadai
             </Link>
             <Badge tone={state.dataMode === "mock" ? "warning" : "success"}>
-              {state.dataMode === "mock" ? "Datos de muestra" : "Supabase"}
+              {state.dataMode === "mock" ? "DB local" : "Postgres"}
             </Badge>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -131,11 +153,6 @@ export function PmsApp() {
             <Button size="sm" variant="ghost" className="text-[var(--nav-muted)]" onClick={toggleTheme} aria-label="Cambiar tema">
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
-            {session ? (
-              <Button size="sm" variant="secondary" onClick={() => { logoutStaff(); setRoleView("guest"); }}>
-                <LogOut className="h-4 w-4" /> {session.name}
-              </Button>
-            ) : null}
           </div>
         </div>
       </header>
@@ -162,7 +179,6 @@ export function PmsApp() {
                 </Button>
               </div>
             </div>
-
             <div className="grid gap-3 sm:grid-cols-3">
               <Card>
                 <CardBody>
@@ -183,7 +199,6 @@ export function PmsApp() {
                 </CardBody>
               </Card>
             </div>
-
             <div>
               <h2 className="font-display mb-3 text-2xl font-semibold">Habitaciones 101–306</h2>
               <RoomRack
@@ -197,18 +212,14 @@ export function PmsApp() {
           </section>
         ) : null}
 
-        {roleView === "admin" && canAdmin ? (
+        {roleView === "admin" ? (
           <section className="fade-in space-y-5">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h1 className="font-display text-3xl font-semibold">Panel PMS</h1>
-                <p className="text-sm text-[var(--text-muted)]">Operación multi-módulo · Challhuahuacho</p>
-              </div>
-              <Button variant="secondary" size="sm" onClick={() => resetDemo().then(() => showToast("Datos de muestra restablecidos"))}>
-                Restablecer muestra
-              </Button>
+            <div>
+              <h1 className="font-display text-3xl font-semibold">Panel PMS</h1>
+              <p className="text-sm text-[var(--text-muted)]">
+                Operación autorizada en servidor · {me?.name || "Administración"}
+              </p>
             </div>
-
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               {[
                 ["Ocupación", `${stats.occupancy}%`],
@@ -225,7 +236,6 @@ export function PmsApp() {
                 </Card>
               ))}
             </div>
-
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="Módulos admin">
               {(
                 [
@@ -248,7 +258,6 @@ export function PmsApp() {
                 </Button>
               ))}
             </div>
-
             {adminTab === "rack" ? (
               <RoomRack
                 rooms={state.rooms}
@@ -269,7 +278,7 @@ export function PmsApp() {
               <PettyCashPanel
                 entries={state.pettyCash}
                 balance={stats.pettyBalance}
-                staffName={session?.name || "Admin"}
+                staffName={me?.name || "Admin"}
                 onAdd={addPettyCash}
               />
             ) : null}
@@ -310,12 +319,9 @@ export function PmsApp() {
           </section>
         ) : null}
 
-        {roleView === "housekeeping" && canHk ? (
+        {roleView === "housekeeping" ? (
           <section className="fade-in space-y-4">
             <h1 className="font-display text-3xl font-semibold">Housekeeping</h1>
-            <p className="text-sm text-[var(--text-muted)]">
-              Habitaciones en limpieza: {state.rooms.filter((r) => r.status === "limpieza").length}
-            </p>
             <div className="grid gap-3 md:grid-cols-2">
               {state.rooms
                 .filter((r) => r.status === "limpieza")
@@ -349,14 +355,23 @@ export function PmsApp() {
       <StaffAuthDialog
         open={authOpen}
         targetRole={authTarget}
+        canBootstrap={canBootstrap}
+        message={authMessage}
         onClose={() => setAuthOpen(false)}
-        onSubmit={async (pin) => {
-          const ok = await loginStaff(pin, authTarget);
-          if (ok) {
+        onBootstrap={async () => {
+          const res = await bootstrapAdmin();
+          if (res.ok) {
+            setAuthOpen(false);
             setRoleView(authTarget === "admin" ? "admin" : "housekeeping");
-            showToast("Sesión de personal iniciada");
+            showToast("Administrador registrado");
+          } else {
+            setAuthMessage(res.error || "No se pudo registrar");
           }
-          return ok;
+        }}
+        onRetry={async () => {
+          await refresh();
+          setAuthOpen(false);
+          await requestRole(authTarget);
         }}
       />
 

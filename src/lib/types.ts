@@ -128,5 +128,5 @@ export interface AppState {
   attendance: AttendanceRecord[];
   housekeepingTasks: HousekeepingTask[];
   roomServiceEnabled: boolean;
-  dataMode: "mock" | "supabase";
+  dataMode: "mock" | "supabase" | "postgres";
 }

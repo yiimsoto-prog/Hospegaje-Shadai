@@ -1,101 +1,36 @@
-# Guía de despliegue — Hospedaje Shadai (código maestro unificado)
+# Despliegue — Hospedaje Shadai
 
-## 1. Control de versiones (GitHub y GitLab)
+## Cursor Apps (recomendado para esta base)
 
-### Preparar el remoto
+1. Publicar con el diálogo **Publish** del agente (app **privada** o **team**).
+2. La plataforma crea Postgres (`cursor-app.json`) y aplica `migrations/*.sql`.
+3. El primer usuario autenticado puede usar **Registrar primer administrador**.
 
-```bash
-git init   # si parte de cero
-git add .
-git commit -m "feat: unified Hospedaje Shadai PWA"
-```
-
-### GitHub
+## GitHub / GitLab
 
 ```bash
-# Crear repo vacío en github.com, luego:
-git remote add origin git@github.com:ORG/hospedaje-shadai.git
-git branch -M main
-git push -u origin main
-```
-
-### GitLab
-
-```bash
+git remote add github git@github.com:ORG/hospedaje-shadai.git   # si aplica
+git push -u github main
+# o GitLab:
 git remote add gitlab git@gitlab.com:ORG/hospedaje-shadai.git
 git push -u gitlab main
 ```
 
-Sincronizar ambos:
+Este workspace ya sincroniza con el remoto Origin de Cursor (`git push origin main`).
 
-```bash
-git remote set-url --add --push origin git@github.com:ORG/hospedaje-shadai.git
-git remote set-url --add --push origin git@gitlab.com:ORG/hospedaje-shadai.git
-git push origin main
-```
+## Cloudflare
 
-## 2. Supabase (antes o en paralelo)
+Esta app usa Route Handlers de Next.js (no es export estático). Opciones:
 
-1. Crear proyecto en [supabase.com](https://supabase.com).
-2. SQL Editor → pegar y ejecutar `supabase/migrations/001_hospedaje_shadai.sql`.
-3. Authentication → crear usuarios de personal y filas en `staff_profiles` (`admin` / `housekeeping`).
-4. Project Settings → API → copiar **Project URL** y **anon public** key.
-5. Local:
+1. **Cursor Apps** (ya soporta API + Postgres), o
+2. Cloudflare con adaptador **OpenNext** (`@opennextjs/cloudflare`) + binding D1/Hyperdrive, o
+3. Frontend estático + **Supabase** como backend (aplicar `supabase/migrations/001_hospedaje_shadai.sql` y cablear el cliente; sin PINs en el browser).
 
-```bash
-cp .env.example .env.local
-# editar NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
-```
+Sin credenciales de Cloudflare (`wrangler login`) no se puede desplegar Pages desde este entorno.
 
-Sin estas variables la app corre en **modo muestra** (localStorage), claramente etiquetado.
+## Supabase
 
-## 3. Cloudflare Pages (CI/CD)
-
-### Opción A — Dashboard
-
-1. Workers & Pages → Create → Pages → Connect to Git (GitHub o GitLab).
-2. Build settings:
-
-| Campo | Valor |
-|---|---|
-| Framework preset | Next.js (Static HTML Export) o None |
-| Build command | `npm run build` |
-| Build output directory | `out` |
-| Node version | `20` (Environment variable `NODE_VERSION=20`) |
-
-3. Environment variables (Production + Preview):
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-4. Save and Deploy.
-
-Archivos incluidos en el repo:
-
-- `wrangler.toml` → `pages_build_output_dir = "out"`
-- `public/_headers` → CSP, nosniff, frame denial
-- `public/_redirects` → placeholder documentado
-- `next.config.ts` → `output: "export"`
-
-### Opción B — Wrangler CLI
-
-```bash
-npm run build
-npx wrangler pages deploy out --project-name=hospedaje-shadai
-```
-
-## 4. Verificación post-deploy
-
-- `/` landing
-- `/pms/` portal + admin + housekeeping
-- `/checkout/?hab=101` check-out móvil (mismo origen → mismo estado)
-- Instalar PWA desde el navegador (manifest en `/manifest.webmanifest`)
-- Headers de seguridad visibles en DevTools → Network
-
-## 5. Rotación de secretos heredados
-
-Las versiones Netlify anteriores publicaban PINs y Wi‑Fi en claro. Tras unificar:
-
-1. Cambiar clave Wi‑Fi del router.
-2. Invalidar cualquier PIN demo en producción.
-3. Despublicar o redirigir los tres sitios Netlify antiguos al dominio único de Cloudflare Pages.
+1. Crear proyecto.
+2. Ejecutar `supabase/migrations/001_hospedaje_shadai.sql`.
+3. Configurar URL/anon key en el host (nunca en git).
+4. Crear usuarios staff en Auth + filas `staff_profiles`.

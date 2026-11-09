@@ -7,15 +7,19 @@
     "build": "next build",
     "start": "next start --port 43123",
     "lint": "eslint .",
-    "preview": "npx --yes serve out -l 43123",
+    "preview": "next start --port 43123",
     "cf:pages": "npm run build"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@supabase/supabase-js": "^2.119.0",
+    "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "jose": "^6.2.17",
     "lucide-react": "^1.70.0",
     "next": "^16.4.6",
+    "pg": "^8.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.7.0"
@@ -23,7 +27,9 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
