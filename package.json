@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "next start --port 43123",
     "cf:build": "opennextjs-cloudflare build",
+    "cf:ci": "npm ci && opennextjs-cloudflare build && wrangler deploy",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf:d1:create": "wrangler d1 create hospedaje-shadai",
