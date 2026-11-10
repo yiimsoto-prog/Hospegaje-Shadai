@@ -126,17 +126,14 @@ export function PmsApp() {
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--nav)] text-[var(--nav-text)]">
+      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--ink)] text-[var(--paper)]">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 font-display text-lg font-semibold">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--brand)]">
-                <BedDouble className="h-4 w-4" />
-              </span>
-              Hospedaje Shadai
+            <Link href="/" className="font-display text-xl tracking-wide">
+              Hospedaje <span className="text-[var(--brass)]">Shadai</span>
             </Link>
             <Badge tone={state.dataMode === "mock" ? "warning" : "success"}>
-              {state.dataMode === "mock" ? "DB local" : "Postgres"}
+              {state.dataMode === "mock" ? "Modo local" : "Datos vivos"}
             </Badge>
           </div>
           <div className="flex flex-wrap items-center gap-2">

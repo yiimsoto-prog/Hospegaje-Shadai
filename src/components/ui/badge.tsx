@@ -2,12 +2,13 @@ import { cn } from "@/lib/utils";
 import { HTMLAttributes } from "react";
 
 const tones = {
+  success: "bg-emerald-500/15 text-emerald-800 border-emerald-500/30 dark:text-emerald-200",
+  warning: "bg-amber-500/15 text-amber-900 border-amber-500/30 dark:text-amber-200",
+  danger: "bg-rose-500/15 text-rose-800 border-rose-500/30 dark:text-rose-200",
+  info: "bg-sky-500/15 text-sky-900 border-sky-500/30 dark:text-sky-200",
   neutral: "bg-[var(--surface-2)] text-[var(--text-muted)] border-[var(--border)]",
-  success: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
-  warning: "bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/30",
-  danger: "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30",
-  info: "bg-sky-500/15 text-sky-800 dark:text-sky-200 border-sky-500/30",
-} as const;
+  brass: "bg-[color-mix(in_oklab,var(--brass)_18%,transparent)] text-[var(--text)] border-[color-mix(in_oklab,var(--brass)_35%,transparent)]",
+};
 
 export function Badge({
   tone = "neutral",
@@ -17,7 +18,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-lg border px-2 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-[0.14em]",
         tones[tone],
         className
       )}

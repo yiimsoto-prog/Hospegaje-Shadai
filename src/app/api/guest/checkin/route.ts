@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { ensureSeeded, sql } from "@/lib/db";
 import { json, requireStaff } from "@/lib/server/authz";
-import { isValidDni, requireFields, sanitizeText } from "@/lib/security/validate";
+import { isValidIdentityDoc, requireFields, sanitizeText } from "@/lib/security/validate";
 
 /**
  * Digital check-in with identity + signature payload.
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   const missing = requireFields(body, ["roomNumber", "workerName", "dni"]);
   if (missing) return json({ error: missing }, 400);
-  if (!isValidDni(body.dni)) return json({ error: "invalid_dni" }, 400);
+  if (!isValidIdentityDoc(body.dni)) return json({ error: "invalid_dni" }, 400);
 
   const roomNumber = sanitizeText(body.roomNumber, 10);
   const workerName = sanitizeText(body.workerName, 120);

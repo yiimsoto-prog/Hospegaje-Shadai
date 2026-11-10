@@ -66,11 +66,21 @@ export function forecastDemand(input: {
     const season = seasonForMonth(d.getUTCMonth() + 1);
     const weekday = d.getUTCDay();
     const weekendBoost = weekday === 5 || weekday === 6 ? 0.06 : 0;
+    // Heurística de parada de planta / mantto minero: dips mid-month in baja season
+    const day = d.getUTCDate();
+    const plantStoppage = season === "baja" && day >= 12 && day <= 16 ? 0.78 : 1;
     const projectedNights = Math.max(
       0,
       Math.min(
         capacity,
-        Math.round(avg * (1 + trend * (i / days)) * seasonMultiplier(season) * (1 + weekendBoost) * (0.85 + nowOcc * 0.3))
+        Math.round(
+          avg *
+            (1 + trend * (i / days)) *
+            seasonMultiplier(season) *
+            (1 + weekendBoost) *
+            (0.85 + nowOcc * 0.3) *
+            plantStoppage
+        )
       )
     );
     const occupancyPct = Math.round((projectedNights / capacity) * 1000) / 10;

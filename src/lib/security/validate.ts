@@ -11,6 +11,12 @@ export function isValidDni(input: unknown): boolean {
   return /^\d{8}$/.test(String(input ?? "").trim());
 }
 
+/** DNI (8) or Carné de Extranjería (9–12 alfanumérico). */
+export function isValidIdentityDoc(input: unknown): boolean {
+  const v = String(input ?? "").trim();
+  return /^\d{8}$/.test(v) || /^[A-Za-z0-9]{9,12}$/.test(v);
+}
+
 export function isValidRuc(input: unknown): boolean {
   return /^\d{11}$/.test(String(input ?? "").trim());
 }

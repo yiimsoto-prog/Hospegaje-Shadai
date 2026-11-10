@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/ops/ai",
     "/ops/maintenance",
     "/ops/security",
+    "/ops/admin",
     "/guest/checkin",
     "/concierge",
   ].map((path) => ({

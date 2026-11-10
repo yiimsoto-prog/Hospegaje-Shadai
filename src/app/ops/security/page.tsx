@@ -1,68 +1,79 @@
 import { OpsShell } from "@/components/ops/ops-shell";
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { KpiCard } from "@/components/ui/kpi-card";
 
 const rows = [
   {
     name: "TLS / SSL",
     status: "Activo",
-    detail: "Terminado en Cloudflare (HTTPS obligatorio en workers.dev y dominios custom).",
+    tone: "success" as const,
+    detail: "HTTPS terminado en Cloudflare (workers.dev y dominio custom).",
   },
   {
     name: "DDoS / WAF",
     status: "Activo",
-    detail: "Mitigación perimetral Cloudflare. Active Rate Limiting/WAF rules en el dashboard del Worker.",
+    tone: "success" as const,
+    detail: "Mitigación perimetral Cloudflare. Active Rate Limiting en el dashboard del Worker.",
   },
   {
     name: "Inyección SQL",
     status: "Mitigado",
-    detail: "Consultas parametrizadas + validación de entrada + PostgREST/D1 bind (sin SQL concatenado).",
+    tone: "success" as const,
+    detail: "Consultas parametrizadas + validación + PostgREST/D1 bind.",
   },
   {
     name: "Auth staff + roles",
     status: "Activo",
-    detail: "Identidad Cursor verificada en servidor; roles admin/housekeeping; panel PMS restringido.",
+    tone: "brass" as const,
+    detail: "JWT HttpOnly o identidad Cursor; roles admin/housekeeping en API.",
   },
   {
     name: "2FA",
     status: "SSO + TOTP listo",
-    detail: "Primario: acceso privado/team Cursor. TOTP opcional por perfil (activar con secreto TOTP_ISSUER).",
+    tone: "info" as const,
+    detail: "Primario: Cursor privada/team. TOTP opcional con STAFF_SESSION_SECRET.",
   },
   {
-    name: "Privacidad de datos",
-    status: "Política operativa",
-    detail: "Sin Wi‑Fi/PINs en el frontend; secretos solo en Worker Secrets; APIs no-store.",
+    name: "Privacidad",
+    status: "Operativo",
+    tone: "success" as const,
+    detail: "Sin secretos en frontend; APIs no-store; CSP en middleware.",
   },
   {
     name: "Pasarela de pagos",
     status: "Adapter",
-    detail: "Configure PAYMENTS_PROVIDER + keys Culqi/Mercado Pago como secretos. No se procesan tarjetas en el browser.",
+    tone: "warning" as const,
+    detail: "PAYMENTS_PROVIDER + keys Culqi/MP como secretos del Worker.",
   },
   {
-    name: "IoT energía / BLE locks",
+    name: "IoT / BLE locks",
     status: "Adapter",
-    detail: "IOT_BRIDGE_URL y BLE_LOCK_PROVIDER conectan el módulo de mantenimiento y acceso sin llaves.",
+    tone: "warning" as const,
+    detail: "IOT_BRIDGE_URL y BLE_LOCK_PROVIDER para energía y acceso sin llaves.",
   },
 ];
 
 export default function SecurityPage() {
+  const active = rows.filter((r) => r.tone === "success").length;
   return (
     <OpsShell
-      title="Ciberseguridad e integraciones"
+      title="Seguridad & cumplimiento"
       subtitle="Controles edge + aplicación. Hardware IoT/BLE y PSP se acoplan por secretos sin exponer credenciales."
     >
+      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <KpiCard label="Controles verdes" value={`${active}/${rows.length}`} tone="ok" />
+        <KpiCard label="Adapters pendientes" value="2" hint="Pagos · IoT/BLE" tone="warn" />
+        <KpiCard label="CSP / Headers" value="ON" tone="brass" />
+      </div>
       <div className="grid gap-3">
         {rows.map((r) => (
-          <Card key={r.name}>
-            <CardHeader className="flex flex-row items-center justify-between gap-3">
-              <h2 className="font-display text-lg font-semibold">{r.name}</h2>
-              <span className="rounded-full bg-[var(--surface-2)] px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                {r.status}
-              </span>
-            </CardHeader>
-            <CardBody>
-              <p className="text-sm text-[var(--text-muted)]">{r.detail}</p>
-            </CardBody>
-          </Card>
+          <article key={r.name} className="border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display text-xl md:text-2xl">{r.name}</h2>
+              <Badge tone={r.tone}>{r.status}</Badge>
+            </div>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">{r.detail}</p>
+          </article>
         ))}
       </div>
     </OpsShell>
