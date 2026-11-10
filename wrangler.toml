@@ -4,6 +4,11 @@ compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 upload_source_maps = true
 
+# Workers Builds often leaves "Build command" empty and only runs
+# `npx wrangler deploy`. This hook builds OpenNext before upload.
+[build]
+command = "npm run cf:build"
+
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
