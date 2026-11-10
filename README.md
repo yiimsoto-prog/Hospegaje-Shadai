@@ -16,8 +16,15 @@ PWA/sistema de gestión para **Hospedaje Shadai** (Challhuahuacho). Unifica land
 | Ruta | Módulo |
 |---|---|
 | `/` | Landing |
+| `/ops` | Centro de operaciones (ERP, IA, seguridad) |
+| `/ops/erp` | Inventario + liquidación B2B minera |
+| `/ops/ai` | Demanda predictiva y precios dinámicos |
+| `/guest/checkin` | Check-in digital con firma |
 | `/pms` | Portal huésped + Admin + Limpieza |
 | `/checkout?hab=101` | Check-out móvil |
+| `/concierge` | Conserje virtual IA 24/7 |
+
+Arquitectura: `docs/ARCHITECTURE.md`. Supabase: `docs/SUPABASE.md`.
 
 ## Desarrollo
 

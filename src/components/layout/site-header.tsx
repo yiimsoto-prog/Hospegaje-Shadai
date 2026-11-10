@@ -10,7 +10,9 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/", label: "Inicio" },
   { href: "/pms", label: "Sistema PMS" },
-  { href: "/checkout", label: "Check-out móvil" },
+  { href: "/ops", label: "Operaciones" },
+  { href: "/checkout", label: "Check-out" },
+  { href: "/concierge", label: "Conserje" },
 ];
 
 export function SiteHeader() {

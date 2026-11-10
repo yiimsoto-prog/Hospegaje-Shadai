@@ -206,6 +206,23 @@ export async function createSupabaseDriver(): Promise<{
         return [] as T[];
       }
 
+      if (lower.startsWith("insert into bookings")) {
+        const { error } = await client.from("bookings").insert({
+          id: String(params[0]),
+          code: String(params[1]),
+          room_number: String(params[2]),
+          guest_name: String(params[3]),
+          guest_doc: String(params[4]),
+          check_in: String(params[5]),
+          status: "activa",
+          base_price: Number(params[6]),
+          charges: [],
+          payments: [],
+        });
+        if (error) throw new Error(error.message);
+        return [] as T[];
+      }
+
       if (lower.startsWith("insert into pernoctas")) {
         const { error } = await client.from("pernoctas").insert({
           id: String(params[0]),

@@ -26,32 +26,38 @@ export default function LandingPage() {
             </p>
             <div className="slide-up mt-8 flex flex-wrap gap-3" style={{ animationDelay: "140ms" }}>
               <Link
-                href="/pms"
+                href="/ops"
                 className="inline-flex h-12 items-center rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
               >
-                Entrar al sistema
+                Centro de operaciones
               </Link>
               <Link
-                href="/checkout"
+                href="/pms"
                 className="inline-flex h-12 items-center rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
               >
-                Check-out móvil
+                PMS / Rack
+              </Link>
+              <Link
+                href="/concierge"
+                className="inline-flex h-12 items-center rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+              >
+                Conserje IA
               </Link>
             </div>
           </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="font-display text-3xl font-semibold tracking-tight">Una sola plataforma operativa</h2>
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Ecosistema Shadai</h2>
           <p className="mt-2 max-w-2xl text-[var(--text-muted)]">
-            Recepción, housekeeping, check-out a mina, liquidación B2B, caja chica y asistencia unificados.
-            Datos de muestra locales hasta conectar Supabase.
+            PMS, ERP de inventarios, liquidación minera parametrizada, check-in digital con firma, IA de
+            demanda/precios, mantenimiento preventivo y conserje virtual — con Cloudflare TLS/WAF.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[
-              ["Check-in / Check-out", "Asignación exprés de guardia y validación DNI con ticket de auditoría."],
-              ["Rack & Housekeeping", "Estados en vivo: disponible, ocupada, limpieza, mantenimiento."],
-              ["B2B · Caja · Asistencia", "Liquidación a contratas, caja chica por sede y marca de personal."],
+              ["Check-in / Check-out digital", "DNI, firma y tickets de auditoría para guardias de contrata."],
+              ["ERP + liquidación B2B", "Inventario, IGV y reportes por cliente minero para cobranza."],
+              ["IA + conserje 24/7", "Proyección de ocupación, tarifas dinámicas y asistencia continua."],
             ].map(([title, body]) => (
               <article key={title} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
                 <h3 className="font-display text-xl font-semibold">{title}</h3>

@@ -19,7 +19,20 @@ export const metadata: Metadata = {
     template: "%s · Hospedaje Shadai",
   },
   description:
-    "PWA unificada de gestión hotelera: reservas, check-in/out minero, housekeeping, caja chica, asistencia y liquidación B2B.",
+    "Hospedaje Shadai — PMS + ERP minero, check-in/out digital, liquidación B2B, IA de demanda, conserje 24/7 y operaciones seguras en Cloudflare.",
+  keywords: [
+    "Hospedaje Shadai",
+    "Challhuahuacho",
+    "hotel minero",
+    "check-out DNI",
+    "liquidación contratas",
+  ],
+  openGraph: {
+    title: "Hospedaje Shadai",
+    description: "Plataforma operativa para hospedaje minero en Challhuahuacho.",
+    locale: "es_PE",
+    type: "website",
+  },
   applicationName: "Hospedaje Shadai",
   manifest: "/manifest.webmanifest",
   icons: {
