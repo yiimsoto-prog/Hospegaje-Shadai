@@ -36,6 +36,7 @@ export function PmsApp() {
     me,
     refresh,
     bootstrapAdmin,
+    loginStaff,
     assignGuardia,
     markRoomClean,
     liberarGuardia,
@@ -67,11 +68,20 @@ export function PmsApp() {
       setRoleView("guest");
       return;
     }
-    const res = await fetch("/api/auth/me", { cache: "no-store" });
+    const res = await fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" });
     if (res.status === 401) {
+      const data = (await res.json().catch(() => ({}))) as {
+        canBootstrap?: boolean;
+        message?: string;
+      };
       setAuthTarget(next);
-      setCanBootstrap(false);
-      setAuthMessage("Inicia sesión con Cursor (app privada o de equipo) para continuar.");
+      setCanBootstrap(Boolean(data.canBootstrap));
+      setAuthMessage(
+        data.message ||
+          (data.canBootstrap
+            ? "Crea el primer administrador con email y contraseña."
+            : "Inicia sesión con email y contraseña de personal.")
+      );
       setAuthOpen(true);
       return;
     }
@@ -358,15 +368,22 @@ export function PmsApp() {
         canBootstrap={canBootstrap}
         message={authMessage}
         onClose={() => setAuthOpen(false)}
-        onBootstrap={async () => {
-          const res = await bootstrapAdmin();
+        onBootstrap={async (creds) => {
+          const res = await bootstrapAdmin(creds);
           if (res.ok) {
             setAuthOpen(false);
-            setRoleView(authTarget === "admin" ? "admin" : "housekeeping");
+            setRoleView("admin");
             showToast("Administrador registrado");
           } else {
-            setAuthMessage(res.error || "No se pudo registrar");
+            throw new Error(res.error || "No se pudo registrar");
           }
+        }}
+        onLogin={async (creds) => {
+          const res = await loginStaff(creds);
+          if (!res.ok) throw new Error(res.error || "Login fallido");
+          setAuthOpen(false);
+          setRoleView(authTarget);
+          showToast("Sesión iniciada");
         }}
         onRetry={async () => {
           await refresh();

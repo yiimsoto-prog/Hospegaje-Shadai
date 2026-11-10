@@ -74,7 +74,8 @@ async function ensureD1Schema(d1: D1Database) {
   const statements = [
     `CREATE TABLE IF NOT EXISTS staff_profiles (
       viewer_sub TEXT PRIMARY KEY, email TEXT NOT NULL DEFAULT '', full_name TEXT NOT NULL DEFAULT '',
-      role TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT (datetime('now')))`,
+      role TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, password_hash TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')))`,
     `CREATE TABLE IF NOT EXISTS hotel_settings (
       id INTEGER PRIMARY KEY CHECK (id = 1), name TEXT NOT NULL, tagline TEXT NOT NULL, city TEXT NOT NULL,
       address TEXT NOT NULL, email TEXT NOT NULL, phones TEXT NOT NULL DEFAULT '[]', wifi_network TEXT NOT NULL,
@@ -111,6 +112,11 @@ async function ensureD1Schema(d1: D1Database) {
   ];
   for (const s of statements) {
     await d1.prepare(s).run();
+  }
+  try {
+    await d1.prepare(`ALTER TABLE staff_profiles ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`).run();
+  } catch {
+    // column already exists
   }
   await d1
     .prepare(

@@ -136,11 +136,21 @@ export async function createSupabaseDriver(): Promise<{
         return (data || []) as T[];
       }
 
-      if (lower.includes("from staff_profiles") && lower.includes("viewer_sub")) {
+      if (lower.includes("from staff_profiles") && lower.includes("viewer_sub =")) {
         const { data, error } = await client
           .from("staff_profiles")
-          .select("role, active")
+          .select("role, active, password_hash, email, full_name, viewer_sub")
           .eq("viewer_sub", String(params[0]))
+          .limit(1);
+        if (error) throw new Error(error.message);
+        return (data || []) as T[];
+      }
+
+      if (lower.includes("from staff_profiles") && lower.includes("lower(email)")) {
+        const { data, error } = await client
+          .from("staff_profiles")
+          .select("viewer_sub, email, full_name, role, active, password_hash")
+          .eq("email", String(params[0]).toLowerCase())
           .limit(1);
         if (error) throw new Error(error.message);
         return (data || []) as T[];
@@ -155,13 +165,15 @@ export async function createSupabaseDriver(): Promise<{
       }
 
       if (lower.startsWith("insert into staff_profiles")) {
-        const { error } = await client.from("staff_profiles").insert({
+        const row: Record<string, unknown> = {
           viewer_sub: String(params[0]),
           email: String(params[1] ?? ""),
           full_name: String(params[2] ?? ""),
           role: "admin",
           active: true,
-        });
+        };
+        if (params.length >= 4) row.password_hash = String(params[3] ?? "");
+        const { error } = await client.from("staff_profiles").insert(row);
         if (error) throw new Error(error.message);
         return [] as T[];
       }

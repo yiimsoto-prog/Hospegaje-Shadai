@@ -4,9 +4,10 @@ Proyecto: `https://ipcakthexcmvazebppym.supabase.co`
 
 ## 1) Crear tablas
 
-En Supabase → **SQL Editor** → New query → pega y ejecuta:
+En Supabase → **SQL Editor** → New query → pega y ejecuta **en orden**:
 
-`supabase/migrations/002_app_runtime.sql`
+1. `supabase/migrations/002_app_runtime.sql`
+2. `supabase/migrations/003_staff_passwords.sql` (login email/contraseña en Cloudflare)
 
 ## 2) Secretos (no los pegues en el chat)
 

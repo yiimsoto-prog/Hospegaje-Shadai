@@ -1,10 +1,10 @@
 import {
   getIdentity,
-  requireIdentity,
   requireTeamRole,
   type Identity,
 } from "../../../cursor/identity";
 import { ensureSeeded, sql } from "@/lib/db";
+import { readStaffToken } from "@/lib/server/staff-session";
 
 export type StaffRole = "admin" | "housekeeping";
 
@@ -12,32 +12,82 @@ export type StaffSession = {
   identity: Identity & { verified: true };
   role: StaffRole | null;
   canBootstrap: boolean;
+  authMode: "cursor" | "password";
 };
+
+function passwordIdentity(claims: {
+  sub: string;
+  email: string;
+  name: string;
+}): Identity & { verified: true } {
+  return {
+    verified: true,
+    simulated: false,
+    token: "",
+    sub: claims.sub,
+    email: claims.email,
+    emailVerified: true,
+    name: claims.name,
+    idp: { provider: "cursor", sub: claims.sub },
+    stage: "production",
+    expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+    claims: {},
+    kind: "person",
+    userId: 0,
+    appVisibility: "private",
+  };
+}
 
 export async function loadStaffSession(request: Request): Promise<StaffSession | Response> {
   await ensureSeeded();
-  // Prefer soft getIdentity so public Cloudflare guest traffic does not hard-fail.
-  const soft = await getIdentity(request);
-  const identity = soft.verified
-    ? soft
-    : await requireIdentity(request);
-  if (identity instanceof Response) return identity;
-  if (!("verified" in identity) || !identity.verified) {
-    return Response.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
-    `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
-    [identity.sub]
-  );
-  const profile = rows[0];
-  const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
-  const role = active ? profile!.role : null;
 
   const countRows = await sql<{ c: number | string }>(`select count(*) as c from staff_profiles`);
   const canBootstrap = Number(countRows[0]?.c ?? 0) === 0;
 
-  return { identity: identity as Identity & { verified: true }, role, canBootstrap };
+  // 1) Password / JWT session (Cloudflare public Worker)
+  const jwt = await readStaffToken(request);
+  if (jwt) {
+    const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
+      `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
+      [jwt.sub]
+    );
+    const profile = rows[0];
+    const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
+    return {
+      identity: passwordIdentity(jwt),
+      role: active ? profile!.role : null,
+      canBootstrap,
+      authMode: "password",
+    };
+  }
+
+  // 2) Cursor app identity (private/team published apps)
+  const soft = await getIdentity(request);
+  if (soft.verified) {
+    const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
+      `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
+      [soft.sub]
+    );
+    const profile = rows[0];
+    const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
+    const role = active ? profile!.role : null;
+    return {
+      identity: soft as Identity & { verified: true },
+      role,
+      canBootstrap,
+      authMode: "cursor",
+    };
+  }
+
+  return Response.json(
+    {
+      error: "unauthorized",
+      needsLogin: true,
+      canBootstrap,
+      message: "Inicia sesión con email y contraseña de personal, o publica la app como privada/team en Cursor.",
+    },
+    { status: 401 }
+  );
 }
 
 export async function requireStaff(
@@ -51,18 +101,22 @@ export async function requireStaff(
     return { identity: session.identity, role: session.role };
   }
 
-  // Team Cursor admins may operate staff modules without a prior staff row.
-  const admin = requireTeamRole(session.identity, ["admin"]);
-  if (!(admin instanceof Response)) {
-    return { identity: session.identity, role: "admin" };
+  if (session.authMode === "cursor") {
+    const admin = requireTeamRole(session.identity, ["admin"]);
+    if (!(admin instanceof Response)) {
+      return { identity: session.identity, role: "admin" };
+    }
   }
 
   return Response.json({ error: "forbidden", message: "Sin permiso de personal" }, { status: 403 });
 }
 
-export function json(data: unknown, status = 200) {
+export function json(data: unknown, status = 200, headers?: HeadersInit) {
   return Response.json(data, {
     status,
-    headers: { "cache-control": "private, no-store" },
+    headers: {
+      "cache-control": "private, no-store",
+      ...headers,
+    },
   });
 }

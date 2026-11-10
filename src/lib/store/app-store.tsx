@@ -32,7 +32,13 @@ type StoreApi = {
   ready: boolean;
   me: Me | null;
   refresh: () => Promise<void>;
-  bootstrapAdmin: () => Promise<{ ok: boolean; error?: string }>;
+  bootstrapAdmin: (creds: {
+    email: string;
+    password: string;
+    fullName: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+  loginStaff: (creds: { email: string; password: string }) => Promise<{ ok: boolean; error?: string }>;
+  logoutStaff: () => Promise<void>;
   assignGuardia: (input: {
     roomNumber: string;
     workerName: string;
@@ -86,6 +92,7 @@ function guestFallback(): AppState {
 async function api<T>(url: string, init?: RequestInit): Promise<{ status: number; data: T }> {
   const res = await fetch(url, {
     ...init,
+    credentials: "same-origin",
     headers: {
       "content-type": "application/json",
       ...(init?.headers || {}),
@@ -127,11 +134,50 @@ export function AppProvider({ children }: { children: ReactNode }) {
     refresh().finally(() => setReady(true));
   }, [refresh]);
 
-  const bootstrapAdmin = useCallback(async () => {
-    const { status, data } = await api<{ error?: string }>("/api/auth/bootstrap", { method: "POST" });
-    if (status >= 400) return { ok: false, error: data.error || "No se pudo inicializar admin" };
+  const bootstrapAdmin = useCallback(
+    async (creds: { email: string; password: string; fullName: string }) => {
+      const { status, data } = await api<{ error?: string }>("/api/auth/bootstrap", {
+        method: "POST",
+        body: JSON.stringify(creds),
+      });
+      if (status >= 400) {
+        return {
+          ok: false,
+          error:
+            data.error === "password_min_8"
+              ? "La contraseña debe tener al menos 8 caracteres"
+              : data.error === "email_required"
+                ? "Email requerido"
+                : data.error === "already_bootstrapped"
+                  ? "Ya existe personal registrado"
+                  : data.error || "No se pudo inicializar admin",
+        };
+      }
+      await refresh();
+      return { ok: true };
+    },
+    [refresh]
+  );
+
+  const loginStaff = useCallback(
+    async (creds: { email: string; password: string }) => {
+      const { status, data } = await api<{ error?: string }>("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(creds),
+      });
+      if (status >= 400) {
+        return { ok: false, error: "Email o contraseña incorrectos" };
+      }
+      void data;
+      await refresh();
+      return { ok: true };
+    },
+    [refresh]
+  );
+
+  const logoutStaff = useCallback(async () => {
+    await api("/api/auth/logout", { method: "POST" });
     await refresh();
-    return { ok: true };
   }, [refresh]);
 
   const assignGuardia = useCallback(
@@ -255,6 +301,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       me,
       refresh,
       bootstrapAdmin,
+      loginStaff,
+      logoutStaff,
       assignGuardia,
       validateCheckout,
       confirmCheckout,
@@ -270,6 +318,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       me,
       refresh,
       bootstrapAdmin,
+      loginStaff,
+      logoutStaff,
       assignGuardia,
       validateCheckout,
       confirmCheckout,
