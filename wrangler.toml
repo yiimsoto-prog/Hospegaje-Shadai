@@ -1,3 +1,19 @@
 name = "hospedaje-shadai"
-compatibility_date = "2026-11-01"
-pages_build_output_dir = "out"
+main = ".open-next/worker.js"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+upload_source_maps = true
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hospedaje-shadai"
+# Replaced automatically after: wrangler d1 create hospedaje-shadai
+database_id = "local-dev-placeholder"
+migrations_dir = "migrations/d1"
+
+[observability]
+enabled = true

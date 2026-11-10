@@ -8,10 +8,15 @@
     "start": "next start --port 43123",
     "lint": "eslint .",
     "preview": "next start --port 43123",
-    "cf:pages": "npm run build"
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:d1:create": "wrangler d1 create hospedaje-shadai",
+    "cf:d1:migrate": "wrangler d1 migrations apply hospedaje-shadai --remote"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@supabase/supabase-js": "^2.119.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -35,7 +40,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.160.0"
   },
   "description": "PWA unificada de gestión Hospedaje Shadai",
   "engines": {

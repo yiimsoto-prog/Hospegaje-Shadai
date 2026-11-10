@@ -30,15 +30,30 @@ git push -u gitlab main
 
 Este workspace ya sincroniza con el remoto Origin de Cursor (`git push origin main`).
 
-## Cloudflare
+## Cloudflare Workers (OpenNext)
 
-Esta app usa Route Handlers de Next.js (no es export estático). Opciones:
+Esta app usa Route Handlers → se despliega en **Cloudflare Workers** con `@opennextjs/cloudflare` (no Pages estático).
 
-1. **Cursor Apps** (ya soporta API + Postgres), o
-2. Cloudflare con adaptador **OpenNext** (`@opennextjs/cloudflare`) + binding D1/Hyperdrive, o
-3. Frontend estático + **Supabase** como backend (aplicar `supabase/migrations/001_hospedaje_shadai.sql` y cablear el cliente; sin PINs en el browser).
+### 1) Credenciales (obligatorio en este agente)
 
-Sin credenciales de Cloudflare (`wrangler login`) no se puede desplegar Pages desde este entorno.
+`wrangler login` redirige a `localhost` del agente y **no** puede completarse desde tu PC. Usa API Token:
+
+1. https://dash.cloudflare.com/profile/api-tokens → Create Token → plantilla **Edit Cloudflare Workers**
+2. Copia el token y el **Account ID** (sidebar del dashboard)
+3. Expórtalos en el entorno del agente / secretos Cursor:
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+4. Responde **token listo** en el chat
+
+### 2) Comandos de deploy
+
+```bash
+npm run cf:d1:create          # crea D1; pega el database_id en wrangler.toml
+npm run cf:d1:migrate         # aplica migrations/d1
+npm run cf:deploy             # build OpenNext + wrangler deploy
+```
+
+Archivos: `open-next.config.ts`, `wrangler.toml`, `migrations/d1/`.
 
 ## Supabase
 
