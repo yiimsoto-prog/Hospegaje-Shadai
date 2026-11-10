@@ -4,19 +4,19 @@ compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 upload_source_maps = true
 
-# OpenNext build is triggered by scripts/wrangler.cjs (postinstall shim)
-# when Cloudflare Workers Builds runs only `npx wrangler deploy`.
+# Workers Builds often leaves Build command empty and only runs
+# `npx wrangler deploy`. This runs OpenNext via node (no .bin permissions).
+[build]
+command = "node ./node_modules/@opennextjs/cloudflare/dist/cli/index.js build"
 
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
 # D1 binding `DB` → database `hospedaje-shadai` is configured in the
-# Cloudflare dashboard (Settings → Bindings). Do not put a fake database_id
-# here — it breaks `wrangler deploy` in Workers Builds.
+# Cloudflare dashboard (Settings → Bindings).
 
 [vars]
-# Prevent cursor/identity.dev simulated admin on public Workers.
 CURSOR_APP_ID = "cloudflare-public-worker"
 
 [observability]

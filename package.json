@@ -29,7 +29,8 @@
     "pg": "^8.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "wrangler": "^4.160.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261110.1",
@@ -43,8 +44,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "wrangler": "^4.160.0"
+    "typescript": "^5"
   },
   "description": "PWA unificada de gestión Hospedaje Shadai",
   "engines": {
