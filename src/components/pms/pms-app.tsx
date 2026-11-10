@@ -4,19 +4,26 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   BedDouble,
+  BookUser,
   ClipboardList,
   Moon,
+  Receipt,
+  Settings2,
   Shield,
   Sparkles,
   Sun,
+  UtensilsCrossed,
   Wallet,
   Users,
 } from "lucide-react";
 import { AssignDialog } from "@/components/pms/assign-dialog";
 import { AttendancePanel } from "@/components/pms/attendance-panel";
 import { B2BPanel } from "@/components/pms/b2b-panel";
+import { FoliosPanel, GuestBookPanel } from "@/components/pms/folios-panel";
+import { GuestPortal } from "@/components/pms/guest-portal";
 import { PettyCashPanel } from "@/components/pms/petty-cash-panel";
 import { RoomRack } from "@/components/pms/room-rack";
+import { SettingsEditor } from "@/components/pms/settings-editor";
 import { StaffAuthDialog } from "@/components/pms/staff-auth-dialog";
 import { StatusPill } from "@/components/pms/status-pill";
 import { useTheme } from "@/components/theme-provider";
@@ -27,7 +34,16 @@ import { useAppStore } from "@/lib/store/app-store";
 import { formatMoney } from "@/lib/utils";
 import type { StaffRole } from "@/lib/types";
 
-type AdminTab = "rack" | "b2b" | "caja" | "asistencia" | "hk";
+type AdminTab =
+  | "rack"
+  | "b2b"
+  | "folios"
+  | "pedidos"
+  | "libro"
+  | "caja"
+  | "asistencia"
+  | "hk"
+  | "edit";
 
 export function PmsApp() {
   const {
@@ -54,6 +70,7 @@ export function PmsApp() {
   const [assignRoom, setAssignRoom] = useState<string | null>(null);
   const [adminTab, setAdminTab] = useState<AdminTab>("rack");
   const [toast, setToast] = useState<string | null>(null);
+  const [foodEnabled, setFoodEnabled] = useState(false);
 
   const canAdmin = me?.role === "admin";
   const canHk = me?.role === "admin" || me?.role === "housekeeping";
@@ -126,12 +143,13 @@ export function PmsApp() {
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--ink)] text-[var(--paper)]">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--navy-deep)] text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/" className="font-display text-xl tracking-wide">
-              Hospedaje <span className="text-[var(--brass)]">Shadai</span>
+              Hospedaje <span className="text-amber-300">Shadai</span>
             </Link>
+            <span className="hidden text-xs italic text-slate-300 sm:inline">{state.hotel.tagline}</span>
             <Badge tone={state.dataMode === "mock" ? "warning" : "success"}>
               {state.dataMode === "mock" ? "Modo local" : "Datos vivos"}
             </Badge>
@@ -139,8 +157,8 @@ export function PmsApp() {
           <div className="flex flex-wrap items-center gap-2">
             {(
               [
-                ["guest", "Huésped"],
-                ["admin", "Admin"],
+                ["guest", "Portal huésped"],
+                ["admin", "Panel PMS (Admin)"],
                 ["housekeeping", "Limpieza"],
               ] as const
             ).map(([id, label]) => (
@@ -148,7 +166,11 @@ export function PmsApp() {
                 key={id}
                 size="sm"
                 variant={roleView === id ? "primary" : "ghost"}
-                className={roleView === id ? "" : "text-[var(--nav-muted)] hover:text-white"}
+                className={
+                  roleView === id
+                    ? "bg-sky-600 text-white hover:bg-sky-500"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                }
                 onClick={() => requestRole(id)}
               >
                 {id !== "guest" && !((id === "admin" && canAdmin) || (id === "housekeeping" && canHk)) ? (
@@ -157,7 +179,14 @@ export function PmsApp() {
                 {label}
               </Button>
             ))}
-            <Button size="sm" variant="ghost" className="text-[var(--nav-muted)]" onClick={toggleTheme} aria-label="Cambiar tema">
+            <Button
+              size="sm"
+              className="bg-amber-500 text-slate-900 hover:bg-amber-400"
+              onClick={() => showToast("En móvil: menú del navegador → Agregar a inicio")}
+            >
+              Instalar en celular
+            </Button>
+            <Button size="sm" variant="ghost" className="text-slate-300" onClick={toggleTheme} aria-label="Cambiar tema">
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
           </div>
@@ -166,91 +195,76 @@ export function PmsApp() {
 
       <main className="mx-auto max-w-7xl px-4 py-6">
         {roleView === "guest" ? (
-          <section className="fade-in space-y-6">
-            <div className="slide-up rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--text-faint)]">Portal huésped</p>
-              <h1 className="font-display mt-2 text-3xl font-semibold md:text-4xl">{state.hotel.name}</h1>
-              <p className="mt-2 max-w-2xl text-[var(--text-muted)]">
-                {state.hotel.tagline}. Wi‑Fi <strong>{state.hotel.wifiNetwork}</strong> —{" "}
-                {state.hotel.wifiPasswordHint}.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Link
-                  href="/checkout"
-                  className="inline-flex h-11 items-center justify-center rounded-xl bg-[var(--brand)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--brand-hover)]"
-                >
-                  Ir a Check-out móvil
-                </Link>
-                <Button variant="secondary" onClick={() => showToast(state.hotel.address)}>
-                  Ver ubicación
-                </Button>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Card>
-                <CardBody>
-                  <p className="text-xs font-semibold uppercase text-[var(--text-faint)]">Libres</p>
-                  <p className="font-display text-3xl font-semibold">{stats.available}</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody>
-                  <p className="text-xs font-semibold uppercase text-[var(--text-faint)]">Ocupación</p>
-                  <p className="font-display text-3xl font-semibold">{stats.occupancy}%</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody>
-                  <p className="text-xs font-semibold uppercase text-[var(--text-faint)]">Check-out</p>
-                  <p className="font-display text-3xl font-semibold">{state.hotel.checkoutHour}</p>
-                </CardBody>
-              </Card>
-            </div>
-            <div>
-              <h2 className="font-display mb-3 text-2xl font-semibold">Habitaciones 101–306</h2>
-              <RoomRack
-                rooms={state.rooms}
-                canManage={false}
-                onAssign={() => undefined}
-                onLiberar={() => undefined}
-                onClean={() => undefined}
-              />
-            </div>
-          </section>
+          <GuestPortal
+            hotel={state.hotel}
+            rooms={state.rooms}
+            available={stats.available}
+            occupancy={stats.occupancy}
+            onToast={showToast}
+          />
         ) : null}
 
         {roleView === "admin" ? (
           <section className="fade-in space-y-5">
-            <div>
-              <h1 className="font-display text-3xl font-semibold">Panel PMS</h1>
-              <p className="text-sm text-[var(--text-muted)]">
-                Operación autorizada en servidor · {me?.name || "Administración"}
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
               {[
-                ["Ocupación", `${stats.occupancy}%`],
-                ["Libres", String(stats.available)],
-                ["Limpieza", String(stats.cleaning)],
-                ["Ingresos", formatMoney(stats.revenue)],
-                ["Caja chica", formatMoney(stats.pettyBalance)],
-              ].map(([label, value]) => (
+                ["Ocupación actual", `${stats.occupancy}%`, "text-sky-700 dark:text-sky-300"],
+                ["Habitaciones libres", String(stats.available), "text-emerald-700 dark:text-emerald-300"],
+                ["En limpieza / turno", String(stats.cleaning), "text-orange-600 dark:text-orange-300"],
+                ["Ingresos registrados", formatMoney(stats.revenue), "text-indigo-700 dark:text-indigo-300"],
+                ["Saldos por cobrar", formatMoney(stats.balanceDue), "text-rose-700 dark:text-rose-300"],
+              ].map(([label, value, tone]) => (
                 <Card key={label}>
                   <CardBody>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-faint)]">{label}</p>
-                    <p className="font-display mt-1 text-2xl font-semibold">{value}</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--text-faint)]">{label}</p>
+                    <p className={`font-display mt-1 text-3xl font-semibold ${tone}`}>{value}</p>
                   </CardBody>
                 </Card>
               ))}
             </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--navy-deep)] px-4 py-3 text-white">
+              <p className="text-sm">
+                Portal huésped público · áreas admin con sesión. Personal autenticado:{" "}
+                <strong>{me?.name || "Administración"}</strong>
+              </p>
+              <Button
+                size="sm"
+                className="bg-amber-500 text-slate-900 hover:bg-amber-400"
+                onClick={() => setAdminTab("edit")}
+              >
+                Editar app
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold">Módulo opcional · servicio & alimentos</p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {foodEnabled ? "Visible en pedidos" : "Oculto / en preparación"}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                className={foodEnabled ? "bg-slate-600" : "bg-emerald-600 hover:bg-emerald-500"}
+                onClick={() => setFoodEnabled((v) => !v)}
+              >
+                {foodEnabled ? "Ocultar alimentos" : "Habilitar alimentos"}
+              </Button>
+            </div>
+
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="Módulos admin">
               {(
                 [
-                  ["rack", "Pizarra", BedDouble],
-                  ["b2b", "Liquidación B2B", ClipboardList],
+                  ["rack", "Pizarra de habitaciones", BedDouble],
+                  ["b2b", "Liquidación B2B (Las Bambas)", ClipboardList],
+                  ["folios", "Consumos & folios", Receipt],
+                  ["pedidos", "Pedidos y servicios", UtensilsCrossed],
+                  ["libro", "Libro de huéspedes", BookUser],
                   ["caja", "Caja chica", Wallet],
                   ["asistencia", "Asistencia", Users],
                   ["hk", "Limpieza", Sparkles],
+                  ["edit", "Editar app", Settings2],
                 ] as const
               ).map(([id, label, Icon]) => (
                 <Button
@@ -258,6 +272,11 @@ export function PmsApp() {
                   size="sm"
                   role="tab"
                   aria-selected={adminTab === id}
+                  className={
+                    adminTab === id
+                      ? "bg-[var(--navy)] text-white hover:bg-[var(--brand-hover)]"
+                      : ""
+                  }
                   variant={adminTab === id ? "primary" : "secondary"}
                   onClick={() => setAdminTab(id)}
                 >
@@ -265,6 +284,7 @@ export function PmsApp() {
                 </Button>
               ))}
             </div>
+
             {adminTab === "rack" ? (
               <RoomRack
                 rooms={state.rooms}
@@ -281,6 +301,15 @@ export function PmsApp() {
               />
             ) : null}
             {adminTab === "b2b" ? <B2BPanel pernoctas={state.pernoctas} /> : null}
+            {adminTab === "folios" ? <FoliosPanel rooms={state.rooms} /> : null}
+            {adminTab === "libro" ? <GuestBookPanel rooms={state.rooms} /> : null}
+            {adminTab === "pedidos" ? (
+              <div className="empty-state">
+                {foodEnabled
+                  ? "Módulo de alimentos habilitado. Conecte inventario/ERP para tomar pedidos."
+                  : "Pedidos y servicios ocultos. Pulse «Habilitar alimentos» para activarlos."}
+              </div>
+            ) : null}
             {adminTab === "caja" ? (
               <PettyCashPanel
                 entries={state.pettyCash}
@@ -322,6 +351,15 @@ export function PmsApp() {
                   })
                 )}
               </div>
+            ) : null}
+            {adminTab === "edit" ? (
+              <SettingsEditor
+                key={`${state.hotel.email}-${state.hotel.wifiNetwork}-${state.rooms[0]?.photo_url || ""}`}
+                hotel={state.hotel}
+                rooms={state.rooms}
+                onSaved={refresh}
+                onToast={showToast}
+              />
             ) : null}
           </section>
         ) : null}
@@ -406,7 +444,7 @@ export function PmsApp() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[var(--nav)] px-4 py-2 text-sm font-semibold text-white"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[var(--navy-deep)] px-4 py-2 text-sm font-semibold text-white"
         >
           {toast}
         </div>

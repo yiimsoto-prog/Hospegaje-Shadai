@@ -14,19 +14,13 @@ type Props = {
   onClean: (roomNumber: string) => void;
 };
 
-const CONFORT = [MEDIA.roomBed, MEDIA.roomTv, MEDIA.roomWarm];
-const ESTANDAR = [MEDIA.roomDouble, MEDIA.bathroom, MEDIA.reception];
-
-function photoFor(room: Room, idx: number) {
-  const pool = room.type === "confort" ? CONFORT : ESTANDAR;
-  return pool[idx % pool.length];
-}
+const FALLBACK = [MEDIA.roomBed, MEDIA.roomTv, MEDIA.roomDouble, MEDIA.roomWarm, MEDIA.bathroom, MEDIA.reception];
 
 export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rooms.map((room, idx) => {
-        const photo = photoFor(room, idx);
+        const photo = room.photo_url || FALLBACK[idx % FALLBACK.length];
         return (
           <article
             key={room.id}
@@ -42,7 +36,7 @@ export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Pro
                 decoding="async"
                 referrerPolicy="no-referrer"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
               <div className="absolute left-3 top-3">
                 <StatusPill status={room.status} />
               </div>

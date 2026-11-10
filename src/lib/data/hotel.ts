@@ -1,4 +1,5 @@
 import type { HotelInfo } from "@/lib/types";
+import { MEDIA } from "@/lib/data/media";
 
 export const HOTEL: HotelInfo = {
   name: "Hospedaje Shadai",
@@ -12,8 +13,11 @@ export const HOTEL: HotelInfo = {
   email: "hospedajeshadai@gmail.com",
   currency: "S/",
   wifiNetwork: "HOSPEDAJE SHADAI",
-  wifiPasswordHint: "Solicitar en recepción (no se publica en el código)",
+  wifiPassword: "",
+  wifiPasswordHint: "Configurar desde Panel Admin → Editar app",
   checkoutHour: "11:00",
+  heroPhoto: MEDIA.heroAndes,
+  galleryPhotos: [MEDIA.roomBed, MEDIA.roomTv, MEDIA.bathroom, MEDIA.reception],
 };
 
 export const SEDES = ["Challhuahuacho"] as const;

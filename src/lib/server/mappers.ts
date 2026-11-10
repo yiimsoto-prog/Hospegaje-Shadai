@@ -6,42 +6,15 @@ import type {
   Pernocta,
   PettyCashEntry,
   Room,
-  RoomAssignment,
 } from "@/lib/types";
+import { mergeHotelFromRow, mergeRoomFromRow } from "@/lib/server/content-store";
 
 export function mapHotel(row: Record<string, unknown>): HotelInfo {
-  return {
-    name: String(row.name),
-    tagline: String(row.tagline),
-    city: String(row.city),
-    address: String(row.address),
-    email: String(row.email),
-    phones: (row.phones as HotelInfo["phones"]) ?? [],
-    currency: String(row.currency ?? "S/"),
-    wifiNetwork: String(row.wifi_network),
-    wifiPasswordHint: "Solicitar en recepción (no se publica en el código)",
-    checkoutHour: String(row.checkout_hour ?? "11:00"),
-  };
+  return mergeHotelFromRow(row);
 }
 
 export function mapRoom(row: Record<string, unknown>): Room {
-  return {
-    id: String(row.id),
-    number: String(row.number),
-    name: String(row.name),
-    type: (row.room_type ?? row.type) as Room["type"],
-    floor: Number(row.floor),
-    capacity: Number(row.capacity),
-    bed: String(row.bed ?? ""),
-    price_per_night: Number(row.price_per_night),
-    status: row.status as Room["status"],
-    amenities: (row.amenities as string[]) ?? [],
-    cleaning_notes: String(row.cleaning_notes ?? ""),
-    housekeeper: null,
-    current_booking_id: row.current_booking_id ? String(row.current_booking_id) : null,
-    cleaning_state: (row.cleaning_state as Room["cleaning_state"]) ?? "limpio",
-    assignment: (row.assignment as RoomAssignment | null) ?? null,
-  };
+  return mergeRoomFromRow(row);
 }
 
 export function mapContrata(row: Record<string, unknown>): Contrata {

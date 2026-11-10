@@ -17,12 +17,16 @@ export async function GET(request: Request) {
     const hotelRows = await sql(`select * from hotel_settings where id = 1`);
     const roomRows = await sql(`select * from rooms order by number`);
     const contrataRows = await sql(`select * from contratas order by razon_social`);
+    const { getCachedHotel, getCachedRooms } = await import("@/lib/server/content-store");
 
     // Public snapshot (guest-safe). Sensitive staff ledgers only if authenticated staff.
+    const hotel = hotelRows[0] ? mapHotel(hotelRows[0]) : getCachedHotel();
+    const rooms = roomRows.length ? roomRows.map((r) => mapRoom(r)) : getCachedRooms();
     const base = {
-      hotel: mapHotel(hotelRows[0] ?? {}),
-      rooms: roomRows.map((r) => mapRoom(r)),
+      hotel,
+      rooms,
       contratas: contrataRows.map((r) => mapContrata(r)),
+      bookings: [] as unknown[],
       pernoctas: [] as ReturnType<typeof mapPernocta>[],
       pettyCash: [] as ReturnType<typeof mapPetty>[],
       attendance: [] as ReturnType<typeof mapAttendance>[],

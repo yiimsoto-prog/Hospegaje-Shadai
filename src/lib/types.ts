@@ -12,9 +12,12 @@ export interface HotelInfo {
   email: string;
   currency: string;
   wifiNetwork: string;
-  /** Never commit real passwords. Loaded from Supabase settings or env at runtime. */
+  /** Editable from admin CMS; shown on guest portal when set. */
+  wifiPassword: string;
   wifiPasswordHint: string;
   checkoutHour: string;
+  heroPhoto: string;
+  galleryPhotos: string[];
 }
 
 export interface RoomAssignment {
@@ -43,6 +46,8 @@ export interface Room {
   current_booking_id: string | null;
   cleaning_state: CleaningState;
   assignment: RoomAssignment | null;
+  /** Public photo URL (Unsplash or CDN). Editable in admin CMS. */
+  photo_url: string;
 }
 
 export interface Contrata {
