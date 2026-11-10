@@ -227,11 +227,90 @@ async function createPostgresOrPgliteDriver(): Promise<DbDriver> {
   };
 }
 
+function isCloudflareWorkerRuntime(): boolean {
+  return (
+    typeof (globalThis as { CloudFlare?: unknown }).CloudFlare !== "undefined" ||
+    typeof (globalThis as { caches?: { default?: unknown } }).caches?.default !== "undefined" ||
+    process.env.NEXT_RUNTIME === "edge" ||
+    Boolean(process.env.CF_PAGES) ||
+    // OpenNext on Workers sets this via our wrangler [vars] / platform
+    Boolean(process.env.CURSOR_APP_ID === "cloudflare-public-worker")
+  );
+}
+
+async function createMemoryDriver(): Promise<DbDriver> {
+  // Last-resort Workers fallback when D1 binding is missing — keeps public UI alive.
+  const { HOTEL } = await import("@/lib/data/hotel");
+  const contratasSeed = (await import("@/lib/data/contratas-seed.json")).default as Array<{
+    id: string;
+    ruc: string;
+    razon_social: string;
+    contacto: string;
+    telefono: string;
+  }>;
+
+  return {
+    kind: "memory",
+    async sql<T extends SqlRow = SqlRow>(text: string) {
+      const q = text.toLowerCase();
+      if (q.includes("hotel_settings")) {
+        return [
+          {
+            id: 1,
+            name: HOTEL.name,
+            tagline: HOTEL.tagline,
+            city: HOTEL.city,
+            address: HOTEL.address,
+            email: HOTEL.email,
+            phones: HOTEL.phones,
+            wifi_network: HOTEL.wifiNetwork,
+            checkout_hour: HOTEL.checkoutHour,
+            currency: HOTEL.currency,
+          },
+        ] as unknown as T[];
+      }
+      if (q.includes("rooms")) {
+        return roomsSeed.map((r) => ({
+          id: r.id,
+          number: r.number,
+          name: r.name,
+          room_type: r.type,
+          floor: r.floor,
+          capacity: r.capacity,
+          bed: r.bed,
+          price_per_night: r.price_per_night,
+          status: r.status,
+          amenities: r.amenities,
+          cleaning_notes: r.cleaning_notes ?? "",
+          cleaning_state: r.cleaning_state ?? "limpio",
+          assignment: null,
+          current_booking_id: null,
+        })) as unknown as T[];
+      }
+      if (q.includes("contratas")) {
+        return contratasSeed.map((c) => ({
+          id: c.id,
+          ruc: c.ruc,
+          razon_social: c.razon_social,
+          contacto: c.contacto,
+          telefono: c.telefono,
+        })) as unknown as T[];
+      }
+      if (q.includes("select 1")) return [{ ok: 1 }] as unknown as T[];
+      return [] as T[];
+    },
+  };
+}
+
 async function getDriver(): Promise<DbDriver> {
   if (!driverPromise) {
     driverPromise = (async () => {
       const d1 = await getCloudflareD1();
       if (d1) return createD1Driver(d1);
+      if (isCloudflareWorkerRuntime()) {
+        console.warn("[hospedaje-shadai] D1 binding DB missing — using in-memory seed fallback");
+        return createMemoryDriver();
+      }
       return createPostgresOrPgliteDriver();
     })().catch((err) => {
       driverPromise = undefined;
