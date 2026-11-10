@@ -1,4 +1,4 @@
-name = "hospedaje-shadai"
+name = "hospegaje-shadai"
 main = ".open-next/worker.js"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
@@ -10,10 +10,14 @@ binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "hospedaje-shadai"
-# Replaced automatically after: wrangler d1 create hospedaje-shadai
+database_name = "hospegaje-shadai"
+# Placeholder until bound in Cloudflare dashboard / wrangler d1 create
 database_id = "local-dev-placeholder"
 migrations_dir = "migrations/d1"
+
+[vars]
+# Prevent cursor/identity.dev simulated admin on public Workers.
+CURSOR_APP_ID = "cloudflare-public-worker"
 
 [observability]
 enabled = true

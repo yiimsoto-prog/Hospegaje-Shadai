@@ -1,4 +1,9 @@
-import { requireIdentity, requireTeamRole, type Identity } from "../../../cursor/identity";
+import {
+  getIdentity,
+  requireIdentity,
+  requireTeamRole,
+  type Identity,
+} from "../../../cursor/identity";
 import { ensureSeeded, sql } from "@/lib/db";
 
 export type StaffRole = "admin" | "housekeeping";
@@ -11,20 +16,28 @@ export type StaffSession = {
 
 export async function loadStaffSession(request: Request): Promise<StaffSession | Response> {
   await ensureSeeded();
-  const identity = await requireIdentity(request);
+  // Prefer soft getIdentity so public Cloudflare guest traffic does not hard-fail.
+  const soft = await getIdentity(request);
+  const identity = soft.verified
+    ? soft
+    : await requireIdentity(request);
   if (identity instanceof Response) return identity;
+  if (!("verified" in identity) || !identity.verified) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
 
-  const rows = await sql<{ role: StaffRole; active: boolean }>(
+  const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
     `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
     [identity.sub]
   );
   const profile = rows[0];
-  const role = profile?.active ? profile.role : null;
+  const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
+  const role = active ? profile!.role : null;
 
-  const countRows = await sql<{ c: string }>(`select count(*)::text as c from staff_profiles`);
+  const countRows = await sql<{ c: number | string }>(`select count(*) as c from staff_profiles`);
   const canBootstrap = Number(countRows[0]?.c ?? 0) === 0;
 
-  return { identity, role, canBootstrap };
+  return { identity: identity as Identity & { verified: true }, role, canBootstrap };
 }
 
 export async function requireStaff(
