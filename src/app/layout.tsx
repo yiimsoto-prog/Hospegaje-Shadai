@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   applicationName: "Hospedaje Shadai",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png" }],
-    apple: [{ url: "/icons/icon-192.png" }],
+    icon: [{ url: "/logo-shadai.png", type: "image/png" }],
+    apple: [{ url: "/logo-shadai.png" }],
   },
   appleWebApp: {
     capable: true,
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1c1915" },
-    { media: "(prefers-color-scheme: dark)", color: "#141210" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
   width: "device-width",
   initialScale: 1,

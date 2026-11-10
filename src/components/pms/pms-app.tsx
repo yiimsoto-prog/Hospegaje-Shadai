@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BedDouble,
   BookUser,
   ClipboardList,
+  LayoutDashboard,
   Moon,
   Receipt,
   Settings2,
@@ -16,6 +17,8 @@ import {
   Wallet,
   Users,
 } from "lucide-react";
+import { BrandLogo } from "@/components/brand/logo";
+import { OpsHub } from "@/components/ops/ops-hub";
 import { AssignDialog } from "@/components/pms/assign-dialog";
 import { AttendancePanel } from "@/components/pms/attendance-panel";
 import { B2BPanel } from "@/components/pms/b2b-panel";
@@ -43,7 +46,15 @@ type AdminTab =
   | "caja"
   | "asistencia"
   | "hk"
+  | "ops"
   | "edit";
+
+function initialAdminTab(): AdminTab {
+  if (typeof window === "undefined") return "rack";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  if (tab === "ops" || tab === "edit" || tab === "b2b" || tab === "rack") return tab;
+  return "rack";
+}
 
 export function PmsApp() {
   const {
@@ -68,9 +79,26 @@ export function PmsApp() {
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [canBootstrap, setCanBootstrap] = useState(false);
   const [assignRoom, setAssignRoom] = useState<string | null>(null);
-  const [adminTab, setAdminTab] = useState<AdminTab>("rack");
+  const [adminTab, setAdminTab] = useState<AdminTab>(initialAdminTab);
   const [toast, setToast] = useState<string | null>(null);
   const [foodEnabled, setFoodEnabled] = useState(false);
+
+  function openAdminTab(tab: AdminTab) {
+    setAdminTab(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.replaceState({}, "", url.toString());
+    }
+  }
+
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab === "ops" || tab === "edit" || tab === "b2b") {
+      void requestRole("admin");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const canAdmin = me?.role === "admin";
   const canHk = me?.role === "admin" || me?.role === "housekeeping";
@@ -143,13 +171,13 @@ export function PmsApp() {
 
   return (
     <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--navy-deep)] text-white">
+      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg)] text-[var(--text)]">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link href="/" className="font-display text-xl tracking-wide">
-              Hospedaje <span className="text-amber-300">Shadai</span>
+            <Link href="/" aria-label="Volver al hotel">
+              <BrandLogo size="sm" />
             </Link>
-            <span className="hidden text-xs italic text-slate-300 sm:inline">{state.hotel.tagline}</span>
+            <Badge tone="neutral">App personal</Badge>
             <Badge tone={state.dataMode === "mock" ? "warning" : "success"}>
               {state.dataMode === "mock" ? "Modo local" : "Datos vivos"}
             </Badge>
@@ -158,19 +186,14 @@ export function PmsApp() {
             {(
               [
                 ["guest", "Portal huésped"],
-                ["admin", "Panel PMS (Admin)"],
+                ["admin", "Administración"],
                 ["housekeeping", "Limpieza"],
               ] as const
             ).map(([id, label]) => (
               <Button
                 key={id}
                 size="sm"
-                variant={roleView === id ? "primary" : "ghost"}
-                className={
-                  roleView === id
-                    ? "bg-sky-600 text-white hover:bg-sky-500"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
-                }
+                variant={roleView === id ? "primary" : "secondary"}
                 onClick={() => requestRole(id)}
               >
                 {id !== "guest" && !((id === "admin" && canAdmin) || (id === "housekeeping" && canHk)) ? (
@@ -179,14 +202,10 @@ export function PmsApp() {
                 {label}
               </Button>
             ))}
-            <Button
-              size="sm"
-              className="bg-amber-500 text-slate-900 hover:bg-amber-400"
-              onClick={() => showToast("En móvil: menú del navegador → Agregar a inicio")}
-            >
-              Instalar en celular
+            <Button size="sm" variant="secondary" onClick={() => showToast("En móvil: menú → Agregar a inicio")}>
+              Instalar PWA
             </Button>
-            <Button size="sm" variant="ghost" className="text-slate-300" onClick={toggleTheme} aria-label="Cambiar tema">
+            <Button size="sm" variant="ghost" onClick={toggleTheme} aria-label="Cambiar tema">
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
           </div>
@@ -223,18 +242,18 @@ export function PmsApp() {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--navy-deep)] px-4 py-3 text-white">
-              <p className="text-sm">
-                Portal huésped público · áreas admin con sesión. Personal autenticado:{" "}
-                <strong>{me?.name || "Administración"}</strong>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+              <p className="text-sm text-[var(--text-muted)]">
+                App de personal vinculada al hotel. Sesión: <strong className="text-[var(--text)]">{me?.name || "Administración"}</strong>
               </p>
-              <Button
-                size="sm"
-                className="bg-amber-500 text-slate-900 hover:bg-amber-400"
-                onClick={() => setAdminTab("edit")}
-              >
-                Editar app
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={() => openAdminTab("ops")}>
+                  Operaciones
+                </Button>
+                <Button size="sm" onClick={() => openAdminTab("edit")}>
+                  Editar app
+                </Button>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
@@ -256,11 +275,12 @@ export function PmsApp() {
             <div className="flex flex-wrap gap-2" role="tablist" aria-label="Módulos admin">
               {(
                 [
-                  ["rack", "Pizarra de habitaciones", BedDouble],
-                  ["b2b", "Liquidación B2B (Las Bambas)", ClipboardList],
+                  ["rack", "Pizarra", BedDouble],
+                  ["ops", "Operaciones", LayoutDashboard],
+                  ["b2b", "Liquidación B2B", ClipboardList],
                   ["folios", "Consumos & folios", Receipt],
-                  ["pedidos", "Pedidos y servicios", UtensilsCrossed],
-                  ["libro", "Libro de huéspedes", BookUser],
+                  ["pedidos", "Pedidos", UtensilsCrossed],
+                  ["libro", "Libro huéspedes", BookUser],
                   ["caja", "Caja chica", Wallet],
                   ["asistencia", "Asistencia", Users],
                   ["hk", "Limpieza", Sparkles],
@@ -272,13 +292,8 @@ export function PmsApp() {
                   size="sm"
                   role="tab"
                   aria-selected={adminTab === id}
-                  className={
-                    adminTab === id
-                      ? "bg-[var(--navy)] text-white hover:bg-[var(--brand-hover)]"
-                      : ""
-                  }
                   variant={adminTab === id ? "primary" : "secondary"}
-                  onClick={() => setAdminTab(id)}
+                  onClick={() => openAdminTab(id)}
                 >
                   <Icon className="h-4 w-4" /> {label}
                 </Button>
@@ -300,6 +315,7 @@ export function PmsApp() {
                 }}
               />
             ) : null}
+            {adminTab === "ops" ? <OpsHub /> : null}
             {adminTab === "b2b" ? <B2BPanel pernoctas={state.pernoctas} /> : null}
             {adminTab === "folios" ? <FoliosPanel rooms={state.rooms} /> : null}
             {adminTab === "libro" ? <GuestBookPanel rooms={state.rooms} /> : null}
@@ -444,7 +460,7 @@ export function PmsApp() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[var(--navy-deep)] px-4 py-2 text-sm font-semibold text-white"
+          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-[var(--border)] bg-[var(--text)] px-4 py-2 text-sm font-semibold text-[var(--bg)]"
         >
           {toast}
         </div>

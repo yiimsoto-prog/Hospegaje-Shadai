@@ -78,47 +78,44 @@ export function B2BPanel({ pernoctas }: { pernoctas: Pernocta[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#0b1f3a] to-[#16375f] p-5 text-white shadow-[var(--shadow-soft)] md:p-6">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)] md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-amber-300">
-              Módulo B2B & auditoría contratas
-            </p>
+            <p className="eyebrow">Módulo B2B & auditoría contratas</p>
             <h2 className="mt-2 font-display text-3xl md:text-4xl">Cierre de mes y liquidación Las Bambas</h2>
-            <p className="mt-2 max-w-2xl text-sm text-sky-100">
+            <p className="mt-2 max-w-2xl text-sm text-[var(--text-muted)]">
               Control de pernoctas validadas con check-out móvil para facturación a contratas.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <select
-              className="h-10 rounded-xl border border-white/20 bg-white/10 px-3 text-sm"
+              className="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
             >
               {MONTHS.map((m, i) => (
-                <option key={m} value={i} className="text-slate-900">
+                <option key={m} value={i}>
                   {m}
                 </option>
               ))}
             </select>
             <select
-              className="h-10 rounded-xl border border-white/20 bg-white/10 px-3 text-sm"
+              className="h-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
             >
               {[year - 1, year, year + 1].map((y) => (
-                <option key={y} value={y} className="text-slate-900">
+                <option key={y} value={y}>
                   {y}
                 </option>
               ))}
             </select>
-            <Button type="button" className="bg-emerald-600 hover:bg-emerald-500" onClick={exportExcel}>
+            <Button type="button" onClick={exportExcel}>
               <Download className="h-4 w-4" /> Descargar Excel (.xls)
             </Button>
             <Button
               type="button"
               variant="secondary"
-              className="border-white/20 bg-white/10 text-white"
               onClick={() => alert("Importe una nómina CSV desde su ERP de contratas (próximo).")}
             >
               <Upload className="h-4 w-4" /> Importar nómina
@@ -128,15 +125,15 @@ export function B2BPanel({ pernoctas }: { pernoctas: Pernocta[] }) {
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Noches validadas", String(totals.noches), "✓ Vía check-out QR", "text-emerald-300"],
-            ["Subtotal (sin IGV)", formatMoney(totals.subtotal), "Base imponible", "text-slate-300"],
-            ["Total facturable (c/ IGV)", formatMoney(totals.total), "Para cobro a contratas", "text-amber-300"],
-            ["Empresas contratas", String(totals.empresas), "Operando en Las Bambas", "text-slate-300"],
-          ].map(([label, value, hint, hintClass]) => (
-            <div key={label} className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-slate-300">{label}</p>
-              <p className="mt-2 font-display text-3xl">{value}</p>
-              <p className={`mt-1 text-xs ${hintClass}`}>{hint}</p>
+            ["Noches validadas", String(totals.noches), "✓ Vía check-out QR"],
+            ["Subtotal (sin IGV)", formatMoney(totals.subtotal), "Base imponible"],
+            ["Total facturable (c/ IGV)", formatMoney(totals.total), "Para cobro a contratas"],
+            ["Empresas contratas", String(totals.empresas), "Operando en Las Bambas"],
+          ].map(([label, value, hint]) => (
+            <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--text-faint)]">{label}</p>
+              <p className="mt-2 font-display text-3xl text-[var(--text)]">{value}</p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">{hint}</p>
             </div>
           ))}
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/logo";
 import { SiteHeader } from "@/components/layout/site-header";
 import { CITY_GALLERY, MEDIA, ROOM_GALLERY } from "@/lib/data/media";
 import { HOTEL } from "@/lib/data/hotel";
@@ -16,18 +17,17 @@ export default function LandingPage() {
               alt="Paisaje altoandino cerca de Challhuahuacho, Apurímac"
               className="hero-kenburns h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,10,8,0.35)_0%,rgba(12,10,8,0.22)_45%,rgba(12,10,8,0.78)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.28)_45%,rgba(0,0,0,0.78)_100%)]" />
           </div>
 
           <div className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 md:pb-24">
-            <p className="slide-up eyebrow text-[color-mix(in_oklab,var(--brass)_85%,white)]">
-              Challhuahuacho · Cotabambas · Apurímac
-            </p>
-            <h1 className="font-display slide-up mt-4 max-w-4xl text-5xl leading-[0.95] sm:text-6xl md:text-7xl lg:text-8xl">
-              Hospedaje Shadai
-            </h1>
+            <div className="slide-up mb-6">
+              <BrandLogo size="hero" priority className="drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]" />
+            </div>
+            <p className="slide-up eyebrow text-white/80">Challhuahuacho · Cotabambas · Apurímac</p>
+            <h1 className="sr-only">Hospedaje Shadai</h1>
             <p
-              className="slide-up mt-5 max-w-xl text-base text-white/85 sm:text-lg"
+              className="slide-up mt-5 max-w-xl text-base text-white/90 sm:text-lg"
               style={{ animationDelay: "90ms" }}
             >
               {HOTEL.tagline}. Habitaciones con cama 2 plazas, smart TV y agua caliente 24h en el
@@ -36,16 +36,22 @@ export default function LandingPage() {
             <div className="slide-up mt-9 flex flex-wrap gap-3" style={{ animationDelay: "160ms" }}>
               <Link
                 href="/guest/checkin"
-                className="inline-flex h-12 items-center bg-[var(--brass)] px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#1c1915] transition hover:brightness-110"
+                className="inline-flex h-12 items-center bg-white px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#2d3137] transition hover:bg-white/90"
               >
                 Check-in digital
               </Link>
               <a
                 href="#habitaciones"
-                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#1c1915]"
+                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#2d3137]"
               >
                 Ver habitaciones
               </a>
+              <Link
+                href="/app"
+                className="inline-flex h-12 items-center border border-white/40 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 transition hover:border-white hover:text-white"
+              >
+                Acceso personal
+              </Link>
             </div>
           </div>
         </section>
@@ -103,13 +109,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-[var(--ink)] py-20 text-[var(--paper)] md:py-28">
+        <section className="border-y border-[var(--border)] bg-[var(--surface-2)] py-20 md:py-28">
           <div className="mx-auto max-w-6xl px-4">
-            <p className="eyebrow text-[var(--brass)]">Challhuahuacho</p>
-            <h2 className="font-display mt-3 max-w-3xl text-4xl md:text-5xl">
+            <p className="eyebrow">Challhuahuacho</p>
+            <h2 className="font-display mt-3 max-w-3xl text-4xl text-[var(--text)] md:text-5xl">
               La ciudad a 4.000 m: Andes, ruta minera y cielo limpio
             </h2>
-            <p className="mt-5 max-w-2xl text-white/70">
+            <p className="mt-5 max-w-2xl text-[var(--text-muted)]">
               Imágenes de paisaje altoandino y pueblos de altura que evocan Cotabambas y el entorno
               de Challhuahuacho — puerta de Las Bambas y descanso para contratas.
             </p>
@@ -160,10 +166,10 @@ export default function LandingPage() {
               <li>· Check-out móvil con DNI</li>
             </ul>
             <Link
-              href="/pms"
-              className="mt-8 inline-flex h-12 items-center bg-[var(--ink)] px-6 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[var(--paper)] transition hover:bg-[var(--brass)] hover:text-[#1c1915]"
+              href="/app"
+              className="mt-8 inline-flex h-12 items-center bg-[var(--text)] px-6 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[var(--bg)] transition hover:opacity-90"
             >
-              Abrir PMS / rack
+              App de personal
             </Link>
           </div>
         </section>
@@ -223,12 +229,15 @@ export default function LandingPage() {
         </section>
 
         <footer className="border-t border-[var(--border)] py-10 text-center">
-          <p className="font-display text-2xl">
-            Hospedaje <span className="text-[var(--brass)]">Shadai</span>
-          </p>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">
+          <div className="mx-auto flex justify-center">
+            <BrandLogo size="lg" />
+          </div>
+          <p className="mt-3 text-sm text-[var(--text-muted)]">
             {HOTEL.city} · {HOTEL.tagline}
           </p>
+          <Link href="/app" className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text)] underline">
+            Acceso personal / operaciones
+          </Link>
         </footer>
       </main>
     </div>

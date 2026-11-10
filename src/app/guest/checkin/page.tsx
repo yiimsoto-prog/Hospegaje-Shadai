@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { OpsShell } from "@/components/ops/ops-shell";
+import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -119,10 +119,16 @@ export default function GuestCheckinPage() {
   }
 
   return (
-    <OpsShell
-      title="Check-in digital"
-      subtitle="Flujo guiado para trabajadores y contratistas Las Bambas: identidad, habitación, firma y auditoría."
-    >
+    <div className="min-h-screen bg-[var(--bg)]">
+      <SiteHeader />
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <header className="mb-8">
+          <p className="eyebrow">Huéspedes</p>
+          <h1 className="font-display mt-2 text-4xl">Check-in digital</h1>
+          <p className="mt-2 text-[var(--text-muted)]">
+            Flujo guiado: identidad, habitación, firma y auditoría.
+          </p>
+        </header>
       <ol className="mb-8 grid grid-cols-2 gap-2 md:grid-cols-4">
         {STEPS.map((label, i) => (
           <li
@@ -271,6 +277,7 @@ export default function GuestCheckinPage() {
           </div>
         ) : null}
       </div>
-    </OpsShell>
+      </main>
+    </div>
   );
 }

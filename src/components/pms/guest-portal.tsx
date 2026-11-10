@@ -39,25 +39,25 @@ export function GuestPortal({ hotel, rooms, available, occupancy, onToast }: Pro
       <div
         className="overflow-hidden rounded-3xl text-white shadow-[var(--shadow-soft)]"
         style={{
-          background: `linear-gradient(135deg, rgba(11,31,58,.88), rgba(15,39,68,.78)), url(${hotel.heroPhoto}) center/cover`,
+          background: `linear-gradient(135deg, rgba(0,0,0,.72), rgba(45,49,55,.55)), url(${hotel.heroPhoto}) center/cover`,
         }}
       >
-        <div className="border-b border-amber-400/40 bg-amber-500/95 px-4 py-2 text-center text-xs font-bold uppercase tracking-[0.18em] text-slate-900">
+        <div className="border-b border-white/20 bg-white px-4 py-2 text-center text-xs font-bold uppercase tracking-[0.18em] text-[#2d3137]">
           Llave física entregada en recepción
         </div>
         <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-bold uppercase tracking-[0.22em] text-amber-300">{hotel.name}</p>
-              <span className="rounded-full bg-sky-500/25 px-2.5 py-0.5 text-xs font-semibold text-sky-100">
+              <p className="text-sm font-bold uppercase tracking-[0.22em] text-white/85">{hotel.name}</p>
+              <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold text-white">
                 Challhuahuacho
               </span>
             </div>
             <h1 className="mt-3 font-display text-3xl leading-tight md:text-5xl">
               Habitaciones disponibles · Pisos 1, 2 y 3 (101 al 306)
             </h1>
-            <p className="mt-2 text-base italic text-amber-200/95">{hotel.tagline}</p>
-            <p className="mt-3 flex items-center gap-2 text-sm text-emerald-300">
+            <p className="mt-2 text-base italic text-white/85">{hotel.tagline}</p>
+            <p className="mt-3 flex items-center gap-2 text-sm text-white">
               <CheckCircle2 className="h-4 w-4" />
               {available} de {rooms.length} habitaciones libres para asignar · ocupación {occupancy}%
             </p>

@@ -2,67 +2,67 @@
 
 :root,
 html[data-theme="light"] {
-  --bg: #f3f6fb;
-  --bg-elevated: #e8eef7;
+  --bg: #ffffff;
+  --bg-elevated: #f7f7f8;
   --surface: #ffffff;
-  --surface-2: #f1f5fb;
-  --surface-3: #dde6f2;
-  --text: #0b1220;
-  --text-muted: #334155;
-  --text-faint: #475569;
-  --border: #c9d4e4;
-  --brand: #0f2744;
-  --brand-hover: #16375f;
-  --gold: #d4a017;
-  --gold-fg: #0b1220;
-  --danger: #c2410c;
-  --ring: #0ea5e9;
-  --hero-overlay: rgba(8, 20, 40, 0.55);
-  --nav: #0b1f3a;
-  --nav-text: #f8fafc;
-  --nav-muted: rgba(248, 250, 252, 0.75);
-  --table-head: #0f2744;
-  --shadow-soft: 0 14px 40px rgba(15, 39, 68, 0.12);
-  --ink: #0f2744;
+  --surface-2: #f3f4f6;
+  --surface-3: #e8eaed;
+  --text: #2d3137;
+  --text-muted: #5b616b;
+  --text-faint: #8b919a;
+  --border: #e2e4e8;
+  --brand: #2d3137;
+  --brand-hover: #1a1d21;
+  --gold: #9aa0a6;
+  --gold-fg: #ffffff;
+  --danger: #b42318;
+  --ring: #2d3137;
+  --hero-overlay: rgba(45, 49, 55, 0.45);
+  --nav: #ffffff;
+  --nav-text: #2d3137;
+  --nav-muted: #5b616b;
+  --table-head: #2d3137;
+  --shadow-soft: 0 10px 30px rgba(45, 49, 55, 0.06);
+  --ink: #2d3137;
   --paper: #ffffff;
-  --brass: #e0a800;
-  --stone: #94a3b8;
-  --success: #15803d;
-  --accent: #f59e0b;
-  --navy: #0f2744;
-  --navy-deep: #0b1f3a;
+  --brass: #8b919a;
+  --stone: #d5d8dd;
+  --success: #1f7a45;
+  --accent: #5b616b;
+  --navy: #2d3137;
+  --navy-deep: #2d3137;
 }
 
 html[data-theme="dark"] {
-  --bg: #0a1220;
-  --bg-elevated: #101b2d;
-  --surface: #132238;
-  --surface-2: #1a2d48;
-  --surface-3: #243a58;
-  --text: #f1f5f9;
-  --text-muted: #d7e2f0;
-  --text-faint: #b6c6db;
-  --border: #2d4464;
-  --brand: #e2e8f0;
-  --brand-hover: #f8fafc;
-  --gold: #f0c14b;
-  --gold-fg: #0a1220;
-  --danger: #fb7185;
-  --ring: #38bdf8;
-  --hero-overlay: rgba(4, 10, 22, 0.62);
-  --nav: #0b1f3a;
-  --nav-text: #f8fafc;
-  --nav-muted: rgba(248, 250, 252, 0.72);
-  --table-head: #e2e8f0;
-  --shadow-soft: 0 16px 44px rgba(0, 0, 0, 0.45);
-  --ink: #e2e8f0;
-  --paper: #132238;
-  --brass: #f0c14b;
-  --stone: #64748b;
+  --bg: #000000;
+  --bg-elevated: #0a0a0a;
+  --surface: #0d0d0d;
+  --surface-2: #141414;
+  --surface-3: #1c1c1c;
+  --text: #f0f0f0;
+  --text-muted: #c8c8c8;
+  --text-faint: #a0a0a0;
+  --border: #2a2a2a;
+  --brand: #ffffff;
+  --brand-hover: #f0f0f0;
+  --gold: #ffffff;
+  --gold-fg: #000000;
+  --danger: #ff6b6b;
+  --ring: #ffffff;
+  --hero-overlay: rgba(0, 0, 0, 0.55);
+  --nav: #000000;
+  --nav-text: #f0f0f0;
+  --nav-muted: #c8c8c8;
+  --table-head: #f0f0f0;
+  --shadow-soft: 0 12px 36px rgba(0, 0, 0, 0.55);
+  --ink: #ffffff;
+  --paper: #000000;
+  --brass: #ffffff;
+  --stone: #3a3a3a;
   --success: #4ade80;
-  --accent: #fbbf24;
-  --navy: #1e3a5f;
-  --navy-deep: #0b1f3a;
+  --accent: #ffffff;
+  --navy: #ffffff;
+  --navy-deep: #0d0d0d;
 }
 
 @theme inline {
@@ -106,8 +106,8 @@ h3,
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--brass) 55%, white);
-  color: #1c1915;
+  background: color-mix(in oklab, var(--text) 18%, transparent);
+  color: var(--text);
 }
 
 .eyebrow {
@@ -115,38 +115,38 @@ h3,
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--text-faint);
 }
 
 .hotel-rule {
   height: 1px;
   width: 100%;
-  background: linear-gradient(90deg, transparent, var(--stone), transparent);
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
 }
 
 .hero-kenburns {
   animation: kenburns 22s ease-in-out infinite alternate;
-  will-change: transform;
+  transform-origin: center center;
 }
 
 @keyframes kenburns {
   from {
-    transform: scale(1.04) translate3d(0, 0, 0);
+    transform: scale(1);
   }
   to {
-    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+    transform: scale(1.08);
   }
 }
 
 .fade-in {
-  animation: fade-in 700ms ease both;
+  animation: fadeIn 0.55s ease both;
 }
 
 .slide-up {
-  animation: slide-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slideUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes fade-in {
+@keyframes fadeIn {
   from {
     opacity: 0;
   }
@@ -155,7 +155,7 @@ h3,
   }
 }
 
-@keyframes slide-up {
+@keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(18px);
@@ -170,32 +170,34 @@ h3,
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
+  background: var(--surface);
 }
 
 table.data {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
-table.data th {
-  text-align: left;
-  padding: 0.75rem 0.85rem;
-  background: var(--surface-2);
-  color: var(--table-head);
-  font-weight: 700;
-  border-bottom: 1px solid var(--border);
-}
-
+table.data th,
 table.data td {
-  padding: 0.75rem 0.85rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
   border-bottom: 1px solid var(--border);
-  color: var(--text);
   vertical-align: top;
 }
 
-table.data tr:hover td {
-  background: color-mix(in oklab, var(--brass) 8%, transparent);
+table.data th {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: var(--surface-2);
+}
+
+table.data tr:last-child td {
+  border-bottom: 0;
 }
 
 .empty-state {
@@ -209,11 +211,9 @@ table.data tr:hover td {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fade-in,
-  .slide-up,
   .hero-kenburns,
-  .active\:scale-\[0\.98\]:active {
+  .fade-in,
+  .slide-up {
     animation: none !important;
-    transform: none !important;
   }
 }

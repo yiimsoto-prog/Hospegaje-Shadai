@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { PmsApp } from "@/components/pms/pms-app";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Sistema PMS",
-};
-
-export default function PmsPage() {
-  return <PmsApp />;
+/** Legacy path → staff app */
+export default function PmsRedirectPage() {
+  redirect("/app");
 }
