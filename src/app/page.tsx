@@ -35,23 +35,23 @@ export default function LandingPage() {
             </p>
             <div className="slide-up mt-9 flex flex-wrap gap-3" style={{ animationDelay: "160ms" }}>
               <Link
-                href="/guest/checkin"
+                href="/app"
                 className="inline-flex h-12 items-center bg-white px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#2d3137] transition hover:bg-white/90"
+              >
+                Portal huésped
+              </Link>
+              <Link
+                href="/guest/checkin"
+                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#2d3137]"
               >
                 Check-in
               </Link>
               <Link
                 href="/concierge"
-                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#2d3137]"
+                className="inline-flex h-12 items-center border border-white/40 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 transition hover:border-white"
               >
                 Conserje
               </Link>
-              <a
-                href="#habitaciones"
-                className="inline-flex h-12 items-center border border-white/40 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 transition hover:border-white"
-              >
-                Ver habitaciones
-              </a>
             </div>
           </div>
         </section>

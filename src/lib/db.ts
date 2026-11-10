@@ -258,6 +258,13 @@ function isCloudflareWorkerRuntime(): boolean {
 async function createMemoryDriver(): Promise<DbDriver> {
   // Last-resort Workers fallback when D1 binding is missing — keeps public UI alive.
   const { getCachedHotel, getCachedRooms } = await import("@/lib/server/content-store");
+  const {
+    getStaffByEmail,
+    getStaffBySub,
+    listStaff,
+    staffCount,
+    upsertStaff,
+  } = await import("@/lib/server/staff-store");
   const contratasSeed = (await import("@/lib/data/contratas-seed.json")).default as Array<{
     id: string;
     ruc: string;
@@ -268,8 +275,33 @@ async function createMemoryDriver(): Promise<DbDriver> {
 
   return {
     kind: "memory",
-    async sql<T extends SqlRow = SqlRow>(text: string) {
+    async sql<T extends SqlRow = SqlRow>(text: string, params: unknown[] = []) {
       const q = text.toLowerCase();
+      if (q.includes("insert into staff_profiles")) {
+        upsertStaff({
+          viewer_sub: String(params[0]),
+          email: String(params[1] ?? "").toLowerCase(),
+          full_name: String(params[2] ?? ""),
+          role: "admin",
+          active: true,
+          password_hash: String(params[3] ?? ""),
+        });
+        return [] as T[];
+      }
+      if (q.includes("count(*)") && q.includes("staff_profiles")) {
+        return [{ c: staffCount() }] as unknown as T[];
+      }
+      if (q.includes("from staff_profiles") && q.includes("viewer_sub")) {
+        const row = getStaffBySub(String(params[0] ?? ""));
+        return (row ? [row] : []) as unknown as T[];
+      }
+      if (q.includes("from staff_profiles") && q.includes("email")) {
+        const row = getStaffByEmail(String(params[0] ?? ""));
+        return (row ? [row] : []) as unknown as T[];
+      }
+      if (q.includes("from staff_profiles")) {
+        return listStaff() as unknown as T[];
+      }
       if (q.includes("update hotel_settings") || q.includes("update rooms")) {
         return [] as T[];
       }

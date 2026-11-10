@@ -149,9 +149,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
               : data.error === "email_required"
                 ? "Email requerido"
                 : data.error === "already_bootstrapped"
-                  ? "Ya existe personal registrado"
+                  ? "Ya existe un administrador. Usa Iniciar sesión."
                   : data.error || "No se pudo inicializar admin",
         };
+      }
+      try {
+        localStorage.setItem("shadai_staff_bootstrapped", "1");
+      } catch {
+        /* ignore */
       }
       await refresh();
       return { ok: true };

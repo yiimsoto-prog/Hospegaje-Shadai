@@ -119,13 +119,17 @@ export function PmsApp() {
         canBootstrap?: boolean;
         message?: string;
       };
+      const already =
+        typeof window !== "undefined" && localStorage.getItem("shadai_staff_bootstrapped") === "1";
       setAuthTarget(next);
-      setCanBootstrap(Boolean(data.canBootstrap));
+      setCanBootstrap(Boolean(data.canBootstrap) && !already);
       setAuthMessage(
-        data.message ||
-          (data.canBootstrap
-            ? "Crea el primer administrador con email y contraseña."
-            : "Inicia sesión con email y contraseña de personal.")
+        already
+          ? "Inicia sesión con el email y contraseña del administrador (ya fue creado)."
+          : data.message ||
+              (data.canBootstrap
+                ? "Crea el primer administrador con email y contraseña."
+                : "Inicia sesión con email y contraseña de personal.")
       );
       setAuthOpen(true);
       return;

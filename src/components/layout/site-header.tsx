@@ -7,8 +7,9 @@ import { BrandLogo } from "@/components/brand/logo";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
-/** Público: solo Conserje + Check-in. El resto vive en /app (admin). */
+/** Público: Portal huésped, Conserje y Check-in. Admin/ops en /app tras login. */
 const publicLinks = [
+  { href: "/app", label: "Portal huésped" },
   { href: "/concierge", label: "Conserje" },
   { href: "/guest/checkin", label: "Check-in" },
 ];
@@ -32,7 +33,7 @@ export function SiteHeader({ variant = "solid" }: { variant?: "solid" | "hero" }
           <BrandLogo size="md" priority className={overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""} />
         </Link>
 
-        <nav className="flex items-center gap-1" aria-label="Público">
+        <nav className="flex flex-wrap items-center justify-end gap-1" aria-label="Público">
           {publicLinks.map((l) => {
             const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
             return (

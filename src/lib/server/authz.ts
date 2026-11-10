@@ -5,6 +5,7 @@ import {
 } from "../../../cursor/identity";
 import { ensureSeeded, sql } from "@/lib/db";
 import { readStaffToken } from "@/lib/server/staff-session";
+import { getStaffBySub, staffCount, upsertStaff } from "@/lib/server/staff-store";
 
 export type StaffRole = "admin" | "housekeeping";
 
@@ -38,25 +39,65 @@ function passwordIdentity(claims: {
   };
 }
 
+async function dbStaffCount(): Promise<number> {
+  try {
+    const countRows = await sql<{ c: number | string }>(`select count(*) as c from staff_profiles`);
+    return Number(countRows[0]?.c ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
+async function loadProfile(sub: string): Promise<{ role: StaffRole; active: boolean } | null> {
+  const cached = getStaffBySub(sub);
+  if (cached) return { role: cached.role, active: cached.active };
+
+  try {
+    const rows = await sql<{
+      role: StaffRole;
+      active: boolean | number | string;
+      email?: string;
+      full_name?: string;
+      password_hash?: string;
+      viewer_sub?: string;
+    }>(`select role, active, email, full_name, password_hash, viewer_sub from staff_profiles where viewer_sub = $1 limit 1`, [
+      sub,
+    ]);
+    const profile = rows[0];
+    if (!profile) return null;
+    const active = profile.active === true || profile.active === 1 || profile.active === "1";
+    if (profile.viewer_sub || profile.email) {
+      upsertStaff({
+        viewer_sub: String(profile.viewer_sub || sub),
+        email: String(profile.email || ""),
+        full_name: String(profile.full_name || ""),
+        role: profile.role,
+        active,
+        password_hash: String(profile.password_hash || ""),
+      });
+    }
+    return { role: profile.role, active };
+  } catch {
+    return null;
+  }
+}
+
 export async function loadStaffSession(request: Request): Promise<StaffSession | Response> {
   await ensureSeeded();
 
-  const countRows = await sql<{ c: number | string }>(`select count(*) as c from staff_profiles`);
-  const canBootstrap = Number(countRows[0]?.c ?? 0) === 0;
+  const dbCount = await dbStaffCount();
+  const canBootstrap = dbCount === 0 && staffCount() === 0;
 
   // 1) Password / JWT session (Cloudflare public Worker)
   const jwt = await readStaffToken(request);
   if (jwt) {
-    const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
-      `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
-      [jwt.sub]
-    );
-    const profile = rows[0];
-    const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
+    const profile = await loadProfile(jwt.sub);
+    // Trust JWT role if profile row is missing (memory reset / delayed DB) so refresh keeps session.
+    const role = profile?.active ? profile.role : jwt.role;
     return {
       identity: passwordIdentity(jwt),
-      role: active ? profile!.role : null,
-      canBootstrap,
+      role,
+      canBootstrap: false,
       authMode: "password",
     };
   }
@@ -64,13 +105,8 @@ export async function loadStaffSession(request: Request): Promise<StaffSession |
   // 2) Cursor app identity (private/team published apps)
   const soft = await getIdentity(request);
   if (soft.verified) {
-    const rows = await sql<{ role: StaffRole; active: boolean | number | string }>(
-      `select role, active from staff_profiles where viewer_sub = $1 limit 1`,
-      [soft.sub]
-    );
-    const profile = rows[0];
-    const active = profile?.active === true || profile?.active === 1 || profile?.active === "1";
-    const role = active ? profile!.role : null;
+    const profile = await loadProfile(soft.sub);
+    const role = profile?.active ? profile.role : null;
     return {
       identity: soft as Identity & { verified: true },
       role,
@@ -84,7 +120,9 @@ export async function loadStaffSession(request: Request): Promise<StaffSession |
       error: "unauthorized",
       needsLogin: true,
       canBootstrap,
-      message: "Inicia sesión con email y contraseña de personal, o publica la app como privada/team en Cursor.",
+      message: canBootstrap
+        ? "Crea el primer administrador con email y contraseña."
+        : "Inicia sesión con email y contraseña de personal.",
     },
     { status: 401 }
   );

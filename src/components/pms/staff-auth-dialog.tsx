@@ -1,9 +1,11 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { StaffRole } from "@/lib/types";
+
+const BOOT_KEY = "shadai_staff_bootstrapped";
 
 type Props = {
   open: boolean;
@@ -33,6 +35,13 @@ export function StaffAuthDialog({
   const [fullName, setFullName] = useState("Administrador");
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"bootstrap" | "login">(canBootstrap ? "bootstrap" : "login");
+
+  useEffect(() => {
+    if (!open) return;
+    const flagged = typeof window !== "undefined" && localStorage.getItem(BOOT_KEY) === "1";
+    setMode(canBootstrap && !flagged ? "bootstrap" : "login");
+  }, [open, canBootstrap]);
 
   if (!open) return null;
 
@@ -40,13 +49,35 @@ export function StaffAuthDialog({
     setBusy(true);
     setLocalError(null);
     try {
-      if (canBootstrap) {
+      if (mode === "bootstrap") {
         await onBootstrap({ email, password, fullName });
+        try {
+          localStorage.setItem(BOOT_KEY, "1");
+          localStorage.setItem("shadai_staff_email", email.toLowerCase());
+        } catch {
+          /* ignore */
+        }
       } else {
         await onLogin({ email, password });
+        try {
+          localStorage.setItem(BOOT_KEY, "1");
+        } catch {
+          /* ignore */
+        }
       }
     } catch (e) {
-      setLocalError(e instanceof Error ? e.message : "Error de acceso");
+      const msg = e instanceof Error ? e.message : "Error de acceso";
+      if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("existe")) {
+        setMode("login");
+        setLocalError("El administrador ya existe. Inicia sesión con tu email y contraseña.");
+        try {
+          localStorage.setItem(BOOT_KEY, "1");
+        } catch {
+          /* ignore */
+        }
+      } else {
+        setLocalError(msg);
+      }
     } finally {
       setBusy(false);
     }
@@ -54,7 +85,7 @@ export function StaffAuthDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
       role="presentation"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -71,9 +102,9 @@ export function StaffAuthDialog({
           {targetRole === "admin" ? "Acceso Administración" : "Acceso Limpieza"}
         </h2>
         <p id={descId} className="mt-2 text-sm text-[var(--text-muted)]">
-          {canBootstrap
-            ? "Crea el primer administrador con email y contraseña (mín. 8 caracteres). La sesión queda en cookie HttpOnly."
-            : "Ingresa con el email y contraseña del personal. También funciona con app Cursor privada/equipo."}
+          {mode === "bootstrap"
+            ? "Crea el primer administrador (mín. 8 caracteres). Luego solo inicia sesión; no hace falta crearlo otra vez."
+            : "Ingresa con el email y contraseña del personal ya registrado."}
         </p>
         {message ? (
           <p role="alert" className="mt-3 text-xs font-semibold text-[var(--danger)]">
@@ -87,7 +118,7 @@ export function StaffAuthDialog({
         ) : null}
 
         <div className="mt-4 grid gap-2">
-          {canBootstrap ? (
+          {mode === "bootstrap" ? (
             <label className="text-sm">
               Nombre
               <Input className="mt-1" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -109,7 +140,7 @@ export function StaffAuthDialog({
             <Input
               className="mt-1"
               type="password"
-              autoComplete={canBootstrap ? "new-password" : "current-password"}
+              autoComplete={mode === "bootstrap" ? "new-password" : "current-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="mínimo 8 caracteres"
@@ -119,11 +150,17 @@ export function StaffAuthDialog({
 
         <div className="mt-4 flex flex-col gap-2">
           <Button type="button" disabled={busy} onClick={() => void submit()}>
-            {busy ? "Procesando…" : canBootstrap ? "Crear administrador" : "Iniciar sesión"}
+            {busy ? "Procesando…" : mode === "bootstrap" ? "Crear administrador" : "Iniciar sesión"}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => onRetry()}>
-            Reintentar sesión Cursor
-          </Button>
+          {mode === "bootstrap" ? (
+            <Button type="button" variant="secondary" onClick={() => setMode("login")}>
+              Ya tengo cuenta — Iniciar sesión
+            </Button>
+          ) : canBootstrap ? (
+            <Button type="button" variant="secondary" onClick={() => setMode("bootstrap")}>
+              Crear primer administrador
+            </Button>
+          ) : null}
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancelar
           </Button>

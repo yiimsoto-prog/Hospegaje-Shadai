@@ -11,11 +11,11 @@ export type StaffJwtClaims = {
 };
 
 function secretKey() {
+  // Prefer a stable dedicated secret. Do NOT use rotating API tokens as signing key.
   const raw =
     process.env.STAFF_SESSION_SECRET?.trim() ||
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    process.env.CLOUDFLARE_API_TOKEN?.trim() ||
-    "hospedaje-shadai-dev-session";
+    "hospedaje-shadai-stable-session-v1";
   return new TextEncoder().encode(raw);
 }
 
