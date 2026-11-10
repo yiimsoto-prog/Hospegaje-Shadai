@@ -34,6 +34,8 @@ Este workspace ya sincroniza con el remoto Origin de Cursor (`git push origin ma
 
 Esta app usa Route Handlers → se despliega en **Cloudflare Workers** con `@opennextjs/cloudflare` (no Pages estático).
 
+Las demos legacy fragmentadas están retiradas; no reutilizar sus URLs ni pegar datos de esas demos en producción.
+
 ### 1) Credenciales (obligatorio en este agente)
 
 `wrangler login` redirige a `localhost` del agente y **no** puede completarse desde tu PC. Usa API Token:

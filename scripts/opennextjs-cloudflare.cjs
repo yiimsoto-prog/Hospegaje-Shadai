@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 /**
- * Wrapper used by Cloudflare Workers Builds when the dashboard keeps
- * "Build command" empty and only runs `npx wrangler deploy`.
- *
- * Wrangler detects OpenNext and calls `opennextjs-cloudflare deploy`
- * without building first. This shim runs `build` before `deploy`.
+ * Backup shim: if anything calls `opennextjs-cloudflare deploy` directly,
+ * build first. Prefer the wrangler shim for Cloudflare Workers Builds.
  */
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
@@ -44,9 +41,7 @@ if (command === "deploy" || command === "upload" || command === "preview") {
     console.error(build.error);
     process.exit(1);
   }
-  if (build.status) {
-    process.exit(build.status);
-  }
+  if (build.status) process.exit(build.status);
 }
 
 run(args);

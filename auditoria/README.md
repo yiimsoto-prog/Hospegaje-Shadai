@@ -1,15 +1,17 @@
 # Auditoría (versión redactada)
 
-El informe forense original de las apps Netlify legacy fue **purgado de credenciales** antes de publicar.
+Las tres aplicaciones legacy fragmentadas fueron **retiradas**. Sus informes con
+credenciales fueron **purgados** de este repositorio.
 
-Hallazgos vigentes (sin secretos):
+Hallazgos vigentes (sin secretos ni URLs antiguas):
 
 - Las versiones antiguas exponían credenciales de personal y Wi‑Fi en el HTML público.
 - La autenticación era solo en el cliente y no constituye un control de seguridad.
-- Había tres orígenes Netlify sin backend compartido.
+- Había tres frontends sin backend compartido ni base de datos única.
 
-La remediación aplicada en el código maestro actual:
+Remediación en el código maestro actual:
 
-- Autorización de personal en rutas `/api/*` con identidad Cursor verificada en servidor.
-- Persistencia en Postgres (`migrations/` + `DATABASE_URL`).
+- Autorización de personal en rutas `/api/*` con identidad verificada en servidor.
+- Persistencia en D1 / Postgres (`migrations/`, binding `DB` o `DATABASE_URL`).
 - Sin PINs ni contraseñas Wi‑Fi en el frontend ni en este directorio.
+- Un solo despliegue: Cloudflare Workers (OpenNext) + GitHub `yiimsoto-prog/Hospegaje-Shadai`.

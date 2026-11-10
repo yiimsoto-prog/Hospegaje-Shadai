@@ -38,9 +38,10 @@ Variables solo si conectas Supabase por tu cuenta (configúralas en el panel del
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-## Cloudflare Pages / GitHub / GitLab
+## Cloudflare Workers / GitHub
 
-Ver `docs/DEPLOY.md`. El build con rutas API requiere un host Node (Cursor Apps, o adaptador OpenNext en Cloudflare). El export estático anterior se eliminó a propósito: no hay frontera de seguridad sin servidor.
+Ver `docs/DEPLOY.md`. Despliegue canónico: **Cloudflare Workers** (OpenNext + D1).
+Las demos legacy fragmentadas están retiradas; este repo no incluye su configuración.
 
 ## Auditoría legacy
 

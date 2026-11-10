@@ -1,24 +1,25 @@
-# Cloudflare Workers Builds — configuración correcta
+# Cloudflare Workers Builds
 
-Tu build falla porque **Comando de compilación = Ninguno** y solo corre `npx wrangler deploy` sin generar `.open-next/worker.js`.
-
-## En el dashboard (Worker `hospedaje-shadai`)
-
-1. **Configuración → Compilaciones** (Builds) → editar configuración.
-2. Pon exactamente:
+## Configuración recomendada en el dashboard
 
 | Campo | Valor |
 |---|---|
-| Comando de compilación | `npm ci && npx @opennextjs/cloudflare build` |
+| Comando de compilación | `npx opennextjs-cloudflare build` *(o déjalo vacío)* |
 | Implementar comando | `npx wrangler deploy` |
 | Directorio raíz | `/` |
-| Versión de Node (si pide) | `20` |
+| Node | `20` |
 
-3. Guarda.
-4. **Vinculaciones** debe tener: `DB` → D1 `hospedaje-shadai` (ya lo tienes).
-5. **Reintentar compilación**.
+## Si el comando de compilación queda en «Ninguno»
 
-## No uses
+Tras `npm clean-install`, `postinstall` enlaza `scripts/wrangler.cjs`.
+Ese shim hace que `npx wrangler deploy` compile OpenNext y luego suba el worker.
+Verás en el log: `[hospedaje-shadai] Building OpenNext before wrangler deploy…`
 
-- Comando de compilación vacío / “Ninguno”
-- Solo `npx wrangler deploy` sin el build de OpenNext
+## Vinculaciones
+
+- `DB` → D1 `hospedaje-shadai` (obligatorio)
+
+## Origen único
+
+El código canónico vive en GitHub (`yiimsoto-prog/Hospegaje-Shadai`) y se publica
+solo en Cloudflare Workers. No hay configuración de otros hosts estáticos en este repo.
