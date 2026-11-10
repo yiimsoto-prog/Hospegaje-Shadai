@@ -2,73 +2,172 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/layout/site-header";
 import { HOTEL } from "@/lib/data/hotel";
 
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2400&q=80";
+
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
+    <div className="min-h-screen bg-[var(--bg)]">
+      <SiteHeader variant="hero" />
       <main>
-        <section className="relative isolate min-h-[88vh] overflow-hidden">
-          <div
-            className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,#1d4ed8_0%,transparent_40%),radial-gradient(circle_at_80%_0%,#b45309_0%,transparent_35%),linear-gradient(160deg,#0f172a,#1e3a8a_55%,#0f172a)]"
-            aria-hidden
-          />
-          <div className="absolute inset-0 -z-10 opacity-40" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
-          <div className="mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 text-white">
-            <p className="slide-up mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-amber-300">
-              Challhuahuacho · Apurímac
+        {/* Hero: brand + one headline + one sentence + CTA + full-bleed image */}
+        <section className="relative isolate min-h-[100svh] overflow-hidden text-white">
+          <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HERO_IMAGE}
+              alt=""
+              className="hero-kenburns h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,10,8,0.35)_0%,rgba(12,10,8,0.25)_40%,rgba(12,10,8,0.72)_100%)]" />
+          </div>
+
+          <div className="mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 md:pb-24">
+            <p className="slide-up eyebrow text-[color-mix(in_oklab,var(--brass)_85%,white)]">
+              Challhuahuacho · Cotabambas · Apurímac
             </p>
-            <h1 className="font-display slide-up text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-              {HOTEL.name}
+            <h1 className="font-display slide-up mt-4 max-w-4xl text-5xl leading-[0.95] sm:text-6xl md:text-7xl lg:text-8xl">
+              Hospedaje Shadai
             </h1>
-            <p className="slide-up mt-4 max-w-xl text-lg text-slate-200" style={{ animationDelay: "80ms" }}>
-              {HOTEL.tagline}. Habitación Simple Confort desde S/ 40 — agua caliente 24h, Wi‑Fi fibra y
-              operación lista para contratas mineras.
+            <p
+              className="slide-up mt-5 max-w-xl text-base text-white/85 sm:text-lg"
+              style={{ animationDelay: "90ms" }}
+            >
+              {HOTEL.tagline}. Descanso altoandino con agua caliente 24h, Wi‑Fi fibra y operación
+              pensada para contratas mineras.
             </p>
-            <div className="slide-up mt-8 flex flex-wrap gap-3" style={{ animationDelay: "140ms" }}>
+            <div className="slide-up mt-9 flex flex-wrap gap-3" style={{ animationDelay: "160ms" }}>
               <Link
-                href="/ops"
-                className="inline-flex h-12 items-center rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
+                href="/guest/checkin"
+                className="inline-flex h-12 items-center bg-[var(--brass)] px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#1c1915] transition hover:brightness-110"
               >
-                Centro de operaciones
+                Check-in digital
               </Link>
               <Link
                 href="/pms"
-                className="inline-flex h-12 items-center rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#1c1915]"
               >
-                PMS / Rack
-              </Link>
-              <Link
-                href="/concierge"
-                className="inline-flex h-12 items-center rounded-xl border border-white/30 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
-              >
-                Conserje IA
+                Ver habitaciones
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="font-display text-3xl font-semibold tracking-tight">Ecosistema Shadai</h2>
-          <p className="mt-2 max-w-2xl text-[var(--text-muted)]">
-            PMS, ERP de inventarios, liquidación minera parametrizada, check-in digital con firma, IA de
-            demanda/precios, mantenimiento preventivo y conserje virtual — con Cloudflare TLS/WAF.
-          </p>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <section className="border-b border-[var(--border)] bg-[var(--surface)]">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              ["Check-in / Check-out digital", "DNI, firma y tickets de auditoría para guardias de contrata."],
-              ["ERP + liquidación B2B", "Inventario, IGV y reportes por cliente minero para cobranza."],
-              ["IA + conserje 24/7", "Proyección de ocupación, tarifas dinámicas y asistencia continua."],
-            ].map(([title, body]) => (
-              <article key={title} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
-                <h3 className="font-display text-xl font-semibold">{title}</h3>
-                <p className="mt-2 text-sm text-[var(--text-muted)]">{body}</p>
+              ["Entrada", "15:00"],
+              ["Salida", HOTEL.checkoutHour],
+              ["Desde", "S/ 40 / noche"],
+              ["Recepción", "24 horas"],
+            ].map(([label, value]) => (
+              <div key={label} className="fade-in">
+                <p className="eyebrow">{label}</p>
+                <p className="font-display mt-2 text-3xl text-[var(--text)]">{value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="eyebrow">El hotel</p>
+            <h2 className="font-display mt-4 text-4xl leading-tight md:text-5xl">
+              Quietud altoandina, proporción y hospitalidad clara
+            </h2>
+            <p className="mt-5 text-[var(--text-muted)] md:text-lg">
+              En Challhuahuacho ofrecemos habitaciones Simple Confort con luz natural, descanso
+              reparador y una operación confiable para equipos de contrata: check-in/out digital,
+              liquidación B2B y soporte las 24 horas.
+            </p>
+          </div>
+
+          <div className="hotel-rule my-14" />
+
+          <div className="grid gap-10 md:grid-cols-3">
+            {[
+              ["Wi‑Fi fibra", "Conectividad estable para coordinación de faena y familia."],
+              ["Agua caliente 24h", "Confort real a altura de Cotabambas, sin interrupciones."],
+              ["Operación minera", "Asignación de guardia, DNI y tickets de auditoría por contrata."],
+            ].map(([title, body], i) => (
+              <article key={title} className="slide-up" style={{ animationDelay: `${i * 80}ms` }}>
+                <p className="eyebrow">0{i + 1}</p>
+                <h3 className="font-display mt-3 text-2xl md:text-3xl">{title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">{body}</p>
               </article>
             ))}
           </div>
         </section>
 
-        <footer className="border-t border-[var(--border)] py-8 text-center text-sm text-[var(--text-muted)]">
-          {HOTEL.address} · WhatsApp {HOTEL.phones[0].number}
+        <section className="bg-[var(--ink)] py-20 text-[var(--paper)] md:py-28">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <p className="eyebrow text-[var(--brass)]">Habitaciones</p>
+                <h2 className="font-display mt-3 text-4xl md:text-5xl">Simple Confort</h2>
+              </div>
+              <Link
+                href="/pms"
+                className="inline-flex h-11 items-center border border-[var(--brass)] px-5 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[var(--brass)] transition hover:bg-[var(--brass)] hover:text-[#1c1915]"
+              >
+                Abrir rack / PMS
+              </Link>
+            </div>
+            <p className="mt-6 max-w-2xl text-white/70">
+              Interiores sobrios, cama 2 plazas, smart TV, calefactor y baño privado. Pensadas para
+              descanso profundo después de jornada en altura.
+            </p>
+          </div>
+        </section>
+
+        <section className="mx-auto grid max-w-6xl gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
+          <div>
+            <p className="eyebrow">Información útil</p>
+            <h2 className="font-display mt-3 text-4xl">Cómo llegar y contactarnos</h2>
+            <p className="mt-4 text-[var(--text-muted)]">{HOTEL.address}</p>
+            <ul className="mt-6 space-y-3 text-sm">
+              {HOTEL.phones.map((p) => (
+                <li key={p.number}>
+                  <span className="font-semibold">{p.label}:</span>{" "}
+                  <a className="underline decoration-[var(--brass)] underline-offset-4" href={`https://wa.me/${p.whatsapp}`}>
+                    {p.number}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <span className="font-semibold">Email:</span> {HOTEL.email}
+              </li>
+            </ul>
+          </div>
+          <div className="border border-[var(--border)] bg-[var(--surface)] p-8">
+            <p className="eyebrow">Accesos del ecosistema</p>
+            <div className="mt-6 grid gap-3">
+              {[
+                ["/ops", "Centro de operaciones"],
+                ["/ops/erp", "ERP / liquidación B2B"],
+                ["/concierge", "Conserje virtual 24/7"],
+                ["/checkout", "Check-out móvil"],
+              ].map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex h-12 items-center justify-between border border-[var(--border)] px-4 text-sm font-semibold transition hover:border-[var(--ink)] hover:bg-[var(--ink)] hover:text-[var(--paper)]"
+                >
+                  <span>{label}</span>
+                  <span aria-hidden>→</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <footer className="border-t border-[var(--border)] py-10 text-center">
+          <p className="font-display text-2xl">
+            Hospedaje <span className="text-[var(--brass)]">Shadai</span>
+          </p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">
+            {HOTEL.city} · {HOTEL.tagline}
+          </p>
         </footer>
       </main>
     </div>

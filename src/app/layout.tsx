@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const display = Fraunces({
+const display = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-display",
 });
 
-const body = Source_Sans_3({
+const body = Outfit({
   subsets: ["latin"],
   variable: "--font-body",
 });
@@ -19,17 +20,17 @@ export const metadata: Metadata = {
     template: "%s · Hospedaje Shadai",
   },
   description:
-    "Hospedaje Shadai — PMS + ERP minero, check-in/out digital, liquidación B2B, IA de demanda, conserje 24/7 y operaciones seguras en Cloudflare.",
+    "Hospedaje Shadai en Challhuahuacho: descanso altoandino, operación para contratas mineras, check-in/out digital y hospitalidad con carácter.",
   keywords: [
     "Hospedaje Shadai",
     "Challhuahuacho",
-    "hotel minero",
+    "hotel Apurímac",
+    "contratas mineras",
     "check-out DNI",
-    "liquidación contratas",
   ],
   openGraph: {
     title: "Hospedaje Shadai",
-    description: "Plataforma operativa para hospedaje minero en Challhuahuacho.",
+    description: "Hospitalidad altoandina en Challhuahuacho, Cotabambas.",
     locale: "es_PE",
     type: "website",
   },
@@ -48,8 +49,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#1d4ed8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1220" },
+    { media: "(prefers-color-scheme: light)", color: "#1c1915" },
+    { media: "(prefers-color-scheme: dark)", color: "#141210" },
   ],
   width: "device-width",
   initialScale: 1,

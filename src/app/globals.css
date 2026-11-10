@@ -2,51 +2,59 @@
 
 :root,
 html[data-theme="light"] {
-  --bg: #f3f6fb;
-  --bg-elevated: #e8eef8;
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-3: #e2e8f0;
-  --text: #0f172a;
-  --text-muted: #334155;
-  --text-faint: #64748b;
-  --border: #cbd5e1;
-  --brand: #1d4ed8;
-  --brand-hover: #1e3a8a;
-  --gold: #d97706;
-  --gold-fg: #0f172a;
-  --danger: #be123c;
-  --ring: #2563eb;
-  --hero-overlay: rgba(15, 23, 42, 0.55);
-  --nav: #0f172a;
-  --nav-text: #f8fafc;
-  --nav-muted: #94a3b8;
-  --table-head: #1e293b;
-  --shadow-soft: 0 1px 0 rgba(15, 23, 42, 0.04);
+  --bg: #f6f3ee;
+  --bg-elevated: #efeae2;
+  --surface: #fffcf8;
+  --surface-2: #f0ebe3;
+  --surface-3: #e4ddd2;
+  --text: #1c1915;
+  --text-muted: #5c5348;
+  --text-faint: #8a7f70;
+  --border: #d9d0c3;
+  --brand: #1c1915;
+  --brand-hover: #3a342c;
+  --gold: #a68445;
+  --gold-fg: #fffcf8;
+  --danger: #9f1239;
+  --ring: #a68445;
+  --hero-overlay: rgba(18, 16, 14, 0.42);
+  --nav: transparent;
+  --nav-text: #fffcf8;
+  --nav-muted: rgba(255, 252, 248, 0.72);
+  --table-head: #1c1915;
+  --shadow-soft: 0 18px 50px rgba(28, 25, 21, 0.08);
+  --ink: #1c1915;
+  --paper: #fffcf8;
+  --brass: #a68445;
+  --stone: #cfc5b6;
 }
 
 html[data-theme="dark"] {
-  --bg: #0b1220;
-  --bg-elevated: #111827;
-  --surface: #152033;
-  --surface-2: #1c2a40;
-  --surface-3: #24344f;
-  --text: #f8fafc;
-  --text-muted: #cbd5e1;
-  --text-faint: #94a3b8;
-  --border: #334155;
-  --brand: #3b82f6;
-  --brand-hover: #60a5fa;
-  --gold: #f59e0b;
-  --gold-fg: #0f172a;
+  --bg: #141210;
+  --bg-elevated: #1c1916;
+  --surface: #221e1a;
+  --surface-2: #2a2520;
+  --surface-3: #352f28;
+  --text: #f6f1ea;
+  --text-muted: #cbbfaf;
+  --text-faint: #9a8f80;
+  --border: #3d362e;
+  --brand: #f6f1ea;
+  --brand-hover: #e7dccb;
+  --gold: #c4a15c;
+  --gold-fg: #141210;
   --danger: #fb7185;
-  --ring: #93c5fd;
-  --hero-overlay: rgba(2, 6, 23, 0.72);
-  --nav: #020617;
-  --nav-text: #f8fafc;
-  --nav-muted: #94a3b8;
-  --table-head: #e2e8f0;
-  --shadow-soft: none;
+  --ring: #c4a15c;
+  --hero-overlay: rgba(8, 7, 6, 0.55);
+  --nav: transparent;
+  --nav-text: #f6f1ea;
+  --nav-muted: rgba(246, 241, 234, 0.7);
+  --table-head: #f6f1ea;
+  --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --ink: #f6f1ea;
+  --paper: #221e1a;
+  --brass: #c4a15c;
+  --stone: #5a5146;
 }
 
 @theme inline {
@@ -65,19 +73,19 @@ body {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(1200px 500px at 10% -10%, color-mix(in oklab, var(--brand) 18%, transparent), transparent),
-    radial-gradient(900px 400px at 90% 0%, color-mix(in oklab, var(--gold) 14%, transparent), transparent),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body), "Helvetica Neue", sans-serif;
+  letter-spacing: 0.01em;
 }
 
 h1,
 h2,
 h3,
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 :focus {
@@ -90,14 +98,70 @@ h3,
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--gold) 45%, white);
-  color: #0f172a;
+  background: color-mix(in oklab, var(--brass) 55%, white);
+  color: #1c1915;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.hotel-rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--stone), transparent);
+}
+
+.hero-kenburns {
+  animation: kenburns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 700ms ease both;
+}
+
+.slide-up {
+  animation: slide-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: 0.75rem;
 }
 
 table.data {
@@ -123,49 +187,22 @@ table.data td {
 }
 
 table.data tr:hover td {
-  background: color-mix(in oklab, var(--brand) 6%, transparent);
+  background: color-mix(in oklab, var(--brass) 8%, transparent);
 }
 
 .empty-state {
   border: 1px dashed var(--border);
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   padding: 2rem 1.25rem;
   text-align: center;
   color: var(--text-muted);
   background: var(--surface);
 }
 
-.fade-in {
-  animation: fade-in 420ms ease both;
-}
-
-.slide-up {
-  animation: slide-up 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .fade-in,
   .slide-up,
+  .hero-kenburns,
   .active\:scale-\[0\.98\]:active {
     animation: none !important;
     transform: none !important;
