@@ -9,6 +9,7 @@ create table if not exists public.staff_profiles (
   full_name text not null default '',
   role text not null check (role in ('admin', 'housekeeping')),
   active boolean not null default true,
+  password_hash text not null default '',
   created_at timestamptz not null default now()
 );
 
