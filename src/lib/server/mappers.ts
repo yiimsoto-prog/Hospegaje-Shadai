@@ -29,7 +29,7 @@ export function mapRoom(row: Record<string, unknown>): Room {
     id: String(row.id),
     number: String(row.number),
     name: String(row.name),
-    type: row.room_type as Room["type"],
+    type: (row.room_type ?? row.type) as Room["type"],
     floor: Number(row.floor),
     capacity: Number(row.capacity),
     bed: String(row.bed ?? ""),

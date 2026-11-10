@@ -19,6 +19,9 @@ binding = "ASSETS"
 
 [vars]
 CURSOR_APP_ID = "cloudflare-public-worker"
+# Public Supabase project URL (safe to commit). Keys go in Worker Secrets.
+SUPABASE_URL = "https://ipcakthexcmvazebppym.supabase.co"
+NEXT_PUBLIC_SUPABASE_URL = "https://ipcakthexcmvazebppym.supabase.co"
 
 [observability]
 enabled = true

@@ -3,7 +3,7 @@ import roomsSeed from "@/lib/data/rooms-seed.json";
 type SqlRow = Record<string, unknown>;
 
 type DbDriver = {
-  kind: "d1" | "postgres" | "pglite" | "memory";
+  kind: "d1" | "postgres" | "pglite" | "memory" | "supabase";
   sql: <T extends SqlRow = SqlRow>(text: string, params?: unknown[]) => Promise<T[]>;
 };
 
@@ -307,8 +307,13 @@ async function getDriver(): Promise<DbDriver> {
     driverPromise = (async () => {
       const d1 = await getCloudflareD1();
       if (d1) return createD1Driver(d1);
+
+      const { createSupabaseDriver } = await import("@/lib/supabase/sql-driver");
+      const supabase = await createSupabaseDriver();
+      if (supabase) return supabase;
+
       if (isCloudflareWorkerRuntime()) {
-        console.warn("[hospedaje-shadai] D1 binding DB missing — using in-memory seed fallback");
+        console.warn("[hospedaje-shadai] No D1/Supabase — using in-memory seed fallback");
         return createMemoryDriver();
       }
       return createPostgresOrPgliteDriver();
@@ -317,7 +322,7 @@ async function getDriver(): Promise<DbDriver> {
       throw err;
     });
   }
-  return driverPromise;
+  return driverPromise as Promise<DbDriver>;
 }
 
 export async function sql<T extends SqlRow = SqlRow>(
