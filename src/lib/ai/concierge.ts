@@ -26,28 +26,28 @@ const FAQ: { keys: string[]; intent: string; answer: string; links?: ConciergeRe
     intent: "pricing",
     answer:
       "Habitación Simple Confort desde S/ 40. Las tarifas dinámicas según ocupación/temporada se ven en Operaciones → IA Demanda.",
-    links: [{ href: "/ops/ai", label: "Ver proyección de demanda" }],
+    links: [{ href: "/app?tab=ops", label: "App personal · IA demanda" }],
   },
   {
     keys: ["factura", "liquidacion", "liquidación", "contrata", "igv"],
     intent: "billing",
     answer:
       "La liquidación B2B agrupa pernoctas por contrata con subtotal + IGV 18%. Genere el reporte parametrizado en ERP.",
-    links: [{ href: "/ops/erp", label: "ERP / liquidación" }],
+    links: [{ href: "/app?tab=ops", label: "App personal · ERP" }],
   },
   {
     keys: ["mantenimiento", "agua", "caliente", "calefactor", "roto"],
     intent: "maintenance",
     answer:
       "Reporte fallas en Mantenimiento preventivo. Priorizamos agua caliente 24h, calefactores y filtración para operación minera.",
-    links: [{ href: "/ops/maintenance", label: "Abrir mantenimiento" }],
+    links: [{ href: "/app?tab=ops", label: "App personal · mantenimiento" }],
   },
   {
     keys: ["pago", "pagar", "yape", "tarjeta", "culqi", "mercadopago"],
     intent: "payments",
     answer:
       "La pasarela de pagos se activa con Culqi/Mercado Pago vía secretos del Worker (nunca en el frontend). Mientras tanto, caja chica y liquidación B2B cubren el flujo operativo.",
-    links: [{ href: "/ops/security", label: "Estado de integraciones" }],
+    links: [{ href: "/app?tab=ops", label: "App personal · seguridad" }],
   },
 ];
 
@@ -63,8 +63,8 @@ export function answerConcierge(message: string): ConciergeReply {
     answer:
       "Soy el conserje virtual 24/7 de Hospedaje Shadai. Puedo ayudar con Wi‑Fi, check-in/out, tarifas, liquidación a contratas y mantenimiento. ¿Qué necesita?",
     links: [
-      { href: "/ops", label: "Centro de operaciones" },
-      { href: "/pms", label: "PMS" },
+      { href: "/app", label: "App de personal" },
+      { href: "/reserve", label: "Reservar habitación" },
       { href: "/checkout", label: "Check-out" },
     ],
   };

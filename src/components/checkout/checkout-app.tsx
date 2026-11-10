@@ -84,7 +84,7 @@ export function CheckoutApp() {
           <Button size="sm" variant="secondary" onClick={toggleTheme} aria-label="Cambiar tema">
             {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </Button>
-          <Link href="/pms" className="text-xs font-semibold text-[var(--brand)]">
+          <Link href="/" className="text-xs font-semibold text-[var(--brand)]">
             PMS
           </Link>
         </div>

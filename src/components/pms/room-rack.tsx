@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { StatusPill } from "@/components/pms/status-pill";
 import { Button } from "@/components/ui/button";
 import { MEDIA } from "@/lib/data/media";
@@ -21,6 +22,7 @@ export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Pro
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rooms.map((room, idx) => {
         const photo = room.photo_url || FALLBACK[idx % FALLBACK.length];
+        const free = !room.assignment && room.status === "disponible";
         return (
           <article
             key={room.id}
@@ -67,9 +69,20 @@ export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Pro
                     </p>
                   ) : null}
                 </div>
+              ) : free ? (
+                <Link
+                  href={`/reserve?room=${encodeURIComponent(room.number)}`}
+                  className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--text)] text-sm font-bold uppercase tracking-[0.12em] text-[var(--bg)] transition hover:opacity-90"
+                >
+                  Reservar y pagar
+                </Link>
               ) : (
-                <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 text-center text-sm font-medium text-[var(--text-muted)]">
-                  Sin asignación activa
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 text-center text-sm font-medium text-[var(--text-muted)]">
+                  {room.status === "limpieza"
+                    ? "En limpieza — no disponible"
+                    : room.status === "mantenimiento"
+                      ? "En mantenimiento"
+                      : "No disponible para reserva"}
                 </div>
               )}
 
@@ -77,7 +90,7 @@ export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Pro
                 <div className="flex flex-wrap gap-2">
                   {room.status === "disponible" ? (
                     <Button size="sm" onClick={() => onAssign(room.number)}>
-                      Check-in
+                      Check-in exprés
                     </Button>
                   ) : null}
                   {room.status === "limpieza" ? (

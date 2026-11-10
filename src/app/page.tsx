@@ -38,20 +38,20 @@ export default function LandingPage() {
                 href="/guest/checkin"
                 className="inline-flex h-12 items-center bg-white px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#2d3137] transition hover:bg-white/90"
               >
-                Check-in digital
+                Check-in
+              </Link>
+              <Link
+                href="/concierge"
+                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#2d3137]"
+              >
+                Conserje
               </Link>
               <a
                 href="#habitaciones"
-                className="inline-flex h-12 items-center border border-white/70 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-[#2d3137]"
+                className="inline-flex h-12 items-center border border-white/40 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 transition hover:border-white"
               >
                 Ver habitaciones
               </a>
-              <Link
-                href="/app"
-                className="inline-flex h-12 items-center border border-white/40 px-6 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/90 transition hover:border-white hover:text-white"
-              >
-                Acceso personal
-              </Link>
             </div>
           </div>
         </section>
@@ -166,10 +166,10 @@ export default function LandingPage() {
               <li>· Check-out móvil con DNI</li>
             </ul>
             <Link
-              href="/app"
+              href="/guest/checkin"
               className="mt-8 inline-flex h-12 items-center bg-[var(--text)] px-6 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[var(--bg)] transition hover:opacity-90"
             >
-              App de personal
+              Reservar / Check-in
             </Link>
           </div>
         </section>
@@ -235,8 +235,11 @@ export default function LandingPage() {
           <p className="mt-3 text-sm text-[var(--text-muted)]">
             {HOTEL.city} · {HOTEL.tagline}
           </p>
-          <Link href="/app" className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text)] underline">
-            Acceso personal / operaciones
+          <Link
+            href="/app"
+            className="mt-4 inline-block text-[0.65rem] uppercase tracking-[0.14em] text-[var(--text-faint)] hover:text-[var(--text)]"
+          >
+            Personal
           </Link>
         </footer>
       </main>

@@ -7,12 +7,10 @@ import { BrandLogo } from "@/components/brand/logo";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
-/** Public hotel site only — staff tools live in /app */
-const links = [
-  { href: "/", label: "Hotel" },
-  { href: "/#habitaciones", label: "Habitaciones" },
-  { href: "/checkout", label: "Check-out" },
+/** Público: solo Conserje + Check-in. El resto vive en /app (admin). */
+const publicLinks = [
   { href: "/concierge", label: "Conserje" },
+  { href: "/guest/checkin", label: "Check-in" },
 ];
 
 export function SiteHeader({ variant = "solid" }: { variant?: "solid" | "hero" }) {
@@ -33,9 +31,10 @@ export function SiteHeader({ variant = "solid" }: { variant?: "solid" | "hero" }
         <Link href="/" className="flex items-center gap-2" aria-label="Hospedaje Shadai">
           <BrandLogo size="md" priority className={overHero ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""} />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Principal">
-          {links.map((l) => {
-            const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href.replace(/#.*$/, ""));
+
+        <nav className="flex items-center gap-1" aria-label="Público">
+          {publicLinks.map((l) => {
+            const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
             return (
               <Link
                 key={l.href}
@@ -55,18 +54,16 @@ export function SiteHeader({ variant = "solid" }: { variant?: "solid" | "hero" }
               </Link>
             );
           })}
-        </nav>
-        <div className="flex items-center gap-2">
           <Link
-            href="/app"
+            href="/guest/checkin"
             className={cn(
-              "inline-flex h-10 items-center border px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] transition",
+              "ml-1 inline-flex h-10 items-center border px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] transition",
               overHero
-                ? "border-white/70 text-white hover:bg-white hover:text-[#2d3137]"
-                : "border-[var(--text)] text-[var(--text)] hover:bg-[var(--text)] hover:text-[var(--bg)]"
+                ? "border-white/70 bg-white text-[#2d3137] hover:bg-white/90"
+                : "border-[var(--text)] bg-[var(--text)] text-[var(--bg)] hover:opacity-90"
             )}
           >
-            Acceso personal
+            Reservar / Check-in
           </Link>
           <button
             type="button"
@@ -81,7 +78,7 @@ export function SiteHeader({ variant = "solid" }: { variant?: "solid" | "hero" }
           >
             {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </button>
-        </div>
+        </nav>
       </div>
     </header>
   );
