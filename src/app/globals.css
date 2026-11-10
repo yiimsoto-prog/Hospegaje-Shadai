@@ -7,10 +7,10 @@ html[data-theme="light"] {
   --surface: #fffcf8;
   --surface-2: #f0ebe3;
   --surface-3: #e4ddd2;
-  --text: #1c1915;
-  --text-muted: #5c5348;
-  --text-faint: #8a7f70;
-  --border: #d9d0c3;
+  --text: #14110e;
+  --text-muted: #3f3830;
+  --text-faint: #5c5348;
+  --border: #d0c6b8;
   --brand: #1c1915;
   --brand-hover: #3a342c;
   --gold: #a68445;
@@ -35,10 +35,10 @@ html[data-theme="dark"] {
   --surface: #221e1a;
   --surface-2: #2a2520;
   --surface-3: #352f28;
-  --text: #f6f1ea;
-  --text-muted: #cbbfaf;
-  --text-faint: #9a8f80;
-  --border: #3d362e;
+  --text: #faf6f0;
+  --text-muted: #e4d8c8;
+  --text-faint: #c9bba8;
+  --border: #4a4137;
   --brand: #f6f1ea;
   --brand-hover: #e7dccb;
   --gold: #c4a15c;
@@ -196,7 +196,8 @@ table.data tr:hover td {
   padding: 2rem 1.25rem;
   text-align: center;
   color: var(--text-muted);
-  background: var(--surface);
+  background: var(--surface-2);
+  font-weight: 500;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -14,52 +14,71 @@ type Props = {
   onClean: (roomNumber: string) => void;
 };
 
-const PHOTOS = [MEDIA.roomBed, MEDIA.roomTv, MEDIA.roomDouble, MEDIA.roomWarm, MEDIA.bathroom, MEDIA.reception];
+const CONFORT = [MEDIA.roomBed, MEDIA.roomTv, MEDIA.roomWarm];
+const ESTANDAR = [MEDIA.roomDouble, MEDIA.bathroom, MEDIA.reception];
+
+function photoFor(room: Room, idx: number) {
+  const pool = room.type === "confort" ? CONFORT : ESTANDAR;
+  return pool[idx % pool.length];
+}
 
 export function RoomRack({ rooms, canManage, onAssign, onLiberar, onClean }: Props) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {rooms.map((room, idx) => {
-        const photo = PHOTOS[idx % PHOTOS.length];
+        const photo = photoFor(room, idx);
         return (
           <article
             key={room.id}
-            className="group overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5"
+            className="group overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5"
           >
-            <div className="relative aspect-[16/10] overflow-hidden">
+            <div className="relative aspect-[16/10] overflow-hidden bg-[var(--surface-2)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo}
-                alt={`Habitación ${room.number}`}
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                alt={`${room.name} · habitación ${room.number}`}
+                className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
                 loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
               />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
               <div className="absolute left-3 top-3">
                 <StatusPill status={room.status} />
               </div>
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/75">
+              <div className="absolute bottom-0 inset-x-0 p-3 text-white">
+                <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/90">
                   Hab. {room.number} · Piso {room.floor}
                 </p>
-                <h3 className="font-display text-2xl leading-tight">{room.name}</h3>
+                <h3 className="font-display text-2xl leading-tight drop-shadow-sm">{room.name}</h3>
               </div>
             </div>
+
             <div className="space-y-3 p-4">
-              <div className="flex items-center justify-between gap-2 text-sm">
-                <span className="text-[var(--text-muted)]">{room.bed}</span>
-                <span className="font-semibold">{formatMoney(room.price_per_night)}/noche</span>
+              <div className="flex items-start justify-between gap-3 text-sm">
+                <span className="leading-snug text-[var(--text-muted)]">{room.bed}</span>
+                <span className="shrink-0 font-semibold text-[var(--text)]">
+                  {formatMoney(room.price_per_night)}
+                  <span className="font-normal text-[var(--text-muted)]"> / noche</span>
+                </span>
               </div>
+
               {room.assignment ? (
-                <div className="border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-sm">
-                  <p className="font-semibold">{room.assignment.workerName}</p>
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2.5 text-sm">
+                  <p className="font-semibold text-[var(--text)]">{room.assignment.workerName}</p>
                   <p className="text-[var(--text-muted)]">DNI {room.assignment.dni}</p>
                   {room.assignment.contrataName ? (
-                    <p className="text-xs text-[var(--text-faint)]">{room.assignment.contrataName}</p>
+                    <p className="mt-0.5 text-xs font-medium text-[var(--text-muted)]">
+                      {room.assignment.contrataName}
+                    </p>
                   ) : null}
                 </div>
               ) : (
-                <p className="text-xs uppercase tracking-[0.14em] text-[var(--text-faint)]">Sin asignación</p>
+                <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] px-3 py-3 text-center text-sm font-medium text-[var(--text-muted)]">
+                  Sin asignación activa
+                </div>
               )}
+
               {canManage ? (
                 <div className="flex flex-wrap gap-2">
                   {room.status === "disponible" ? (
