@@ -8,6 +8,18 @@
 
 ## GitHub / GitLab
 
+Remoto canónico del producto:
+
+- https://github.com/yiimsoto-prog/Hospegaje-Shadai
+
+En este workspace el remoto se llama `github`:
+
+```bash
+git remote add github https://github.com/yiimsoto-prog/Hospegaje-Shadai.git
+git push -u github main
+```
+
+
 ```bash
 git remote add github git@github.com:ORG/hospedaje-shadai.git   # si aplica
 git push -u github main

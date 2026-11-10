@@ -1,5 +1,7 @@
 # Hospedaje Shadai — código maestro unificado
 
+Repositorio GitHub: [https://github.com/yiimsoto-prog/Hospegaje-Shadai](https://github.com/yiimsoto-prog/Hospegaje-Shadai)
+
 PWA/sistema de gestión para **Hospedaje Shadai** (Challhuahuacho). Unifica landing, PMS, housekeeping, check-out móvil, caja chica, asistencia y liquidación B2B.
 
 ## Seguridad (producción)
